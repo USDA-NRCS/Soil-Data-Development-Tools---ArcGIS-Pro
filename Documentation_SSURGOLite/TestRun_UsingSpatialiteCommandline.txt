@@ -1,0 +1,70 @@
+S
+
+Start Time: Wednesday, June 30, 2021 6:04:13 AM
+.	Extensions folder: D:\Geodata\2021\SQLite_Tests\ApplicationData\Extensions
+.	Creating list of shapefiles to be imported for each survey area...
+Creating new database: D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite015.sqlite
+.	Creating new database connection...
+.	Turning OFF foreign key constraints...
+.	Increasing database cache size...
+.
+Setting cache size for indexing performance...
+.	Dropping attribute indexes from new database...
+.
+.	Importing tabular data using function 'ImportTabularSQL2'...
+.	Excluding 6 deprecated cointerp columns
+.	Finally closing database after tabular import
+All tabular data imported
+.	Using new function: AppendFeatures_Spatialite
+.
+Appending 2 map unit polygon shapefiles to create new featureclass: mupolygon
+.	Processing D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157.shp...
+.
+.	Shapefile imported...
+.	Result: SQLite version: 3.33.0
+SpatiaLite version: 5.0.0
+Inserted 1842 rows into 'xx_mupolygon' from 'D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157.shp'
+.	Executed insert
+.	Mupolygon import error?
+.	Mupolygon import result stdout:
+.
+.	Dropping table xx_mupolygon
+.	resultError was an empty string
+.	Drop succeeded..
+.	Drop result error:
+.	Drop result stdout:
+.	Processing D:\Geodata\2021\SSURGO_Downloads\soil_mo017\spatial\soilmu_a_mo017.shp...
+.
+.	Shapefile imported...
+.	Result: SQLite version: 3.33.0
+SpatiaLite version: 5.0.0
+AddGeometryColumn() error: "UNIQUE constraint failed: geometry_columns.f_table_name, geometry_columns.f_geometry_column"
+Inserted 7246 rows into 'xx_mupolygon' from 'D:\Geodata\2021\SSURGO_Downloads\soil_mo017\spatial\soilmu_a_mo017.shp'
+.	Executed insert
+.	Mupolygon import error?
+.	Mupolygon import result stdout:
+.
+.	Dropping table xx_mupolygon
+.	resultError was an empty string
+.	Drop succeeded..
+.	Drop result error:
+.	Drop result stdout:
+.	Current end of 'for shpFile' iteration
+.	Process complete for this function...
+.	Finally closing database
+.	Registering spatial layers to the database
+.
+All tabular and spatial data have been imported...
+.
+Restoring previously existing attribute indexes for the new database...
+.
+Compacting new database...
+.	Database size before:	106 MB
+.	Free temp space: 150,467 MB
+.	Minimum free disk space required: 212 MB
+.	Database size after:	101 MB
+.	Finished compacting database...
+.
+Output database:  D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite015.sqlite
+Succeeded at Wednesday, June 30, 2021 6:06:30 AM (Elapsed Time: 2 minutes 16 seconds)
+

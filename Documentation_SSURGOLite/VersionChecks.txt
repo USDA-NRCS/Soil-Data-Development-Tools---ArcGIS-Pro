@@ -1,0 +1,39 @@
+
+# Version checks are used to make sure that the SSURGO-TabularData being imported is compatible with the Database_Template.
+# Some of these are actually hard-coded in the VBA, but except for perhaps all but the ExpectedImportDataModelVersion should come from the system table?
+# Currently these version numbers are all focused on tabular data, but probably should be expanded to cover spatial version information as well.
+
+# If I remove 6 columns from the templateDB.cointerp but left the SSURGO version the same, that would require a change in the ImportDataModel and would also be dependent on the SSURGOVersion.
+
+Inputs:
+    a. The version.txt files located in both tabular/spatial folders
+    b. Database.system_templatedatabaseinformation table
+    c. Varification code that was originally found in a VBA macro (Import Procedures.Verify_Version_Info)
+
+Example of version.txt:  2.3.3
+
+
+VBA variables: 
+    1. VersionString (char)
+    2. SSURGOVersion (int)
+    3. ImportDataModelVersion (int)
+    4. MetadataVersion (int)
+    5. ExpectedSSURGOVersion (?)
+
+VBA Constants:
+    ExpectedSSURGOVersion = 2
+    ExpectedImportDataModelVersion = 3
+    BaseMetadataVersion = 1
+
+
+Logic:
+    a. version.txt file must exist. I believe this is only looking at tabular\version.txt
+    b. Read first line in version.txt as VersionString
+    c. VersionString must not be null and length must be >= 5
+    d. Must be able to split VersionString into 3 parts using "." as the delimiter (SSURGOVersion, ImportDataModelVersion, MetadataVersion)
+    e. Each part must be numeric
+    f. Compare each version.txt value to the expected values. 
+        1. 
+        2. 
+        3. MetadataVersion must be greater than BaseMetadataVersion
+

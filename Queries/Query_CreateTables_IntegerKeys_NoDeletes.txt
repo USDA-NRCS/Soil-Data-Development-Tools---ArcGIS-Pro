@@ -1,0 +1,1193 @@
+-- Begin Create Table queries
+CREATE TABLE sacatalog(
+areasymbol CHARACTER(20) NOT NULL,
+areaname CHARACTER(135) NOT NULL,
+saversion INTEGER NOT NULL,
+saverest TIMESTAMP NOT NULL,
+tabularversion INTEGER NOT NULL,
+tabularverest TIMESTAMP NOT NULL,
+tabnasisexportdate TIMESTAMP NOT NULL,
+tabcertstatus CHARACTER(254),
+tabcertstatusdesc CHARACTER(2147483647),
+fgdcmetadata CHARACTER(2147483647) NOT NULL,
+sacatalogkey INTEGER NOT NULL PRIMARY KEY
+);
+--
+CREATE TABLE sainterp(
+areasymbol CHARACTER(20) NOT NULL,
+interpname CHARACTER(60) NOT NULL,
+interptype CHARACTER(254) NOT NULL,
+interpdesc CHARACTER(2147483647),
+interpdesigndate TIMESTAMP NOT NULL,
+interpgendate TIMESTAMP NOT NULL,
+interpmaxreasons INTEGER,
+sacatalogkey INTEGER NOT NULL,
+sainterpkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (sacatalogkey) REFERENCES sacatalog(sacatalogkey)
+);
+--
+CREATE TABLE distmd(
+distgendate TIMESTAMP,
+diststatus CHARACTER(254) NOT NULL,
+interpmaxreasons INTEGER,
+distmdkey INTEGER NOT NULL PRIMARY KEY
+);
+--
+CREATE TABLE legend(
+areatypename CHARACTER(45) NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+areaname CHARACTER(135),
+areaacres INTEGER,
+mlraoffice CHARACTER(254),
+legenddesc CHARACTER(60),
+ssastatus CHARACTER(254),
+mouagncyresp CHARACTER(254),
+projectscale INTEGER,
+cordate TIMESTAMP,
+ssurgoarchived TIMESTAMP,
+legendsuituse CHARACTER(254),
+legendcertstat CHARACTER(254),
+lkey INTEGER NOT NULL PRIMARY KEY
+);
+--
+CREATE TABLE distinterpmd(
+rulename CHARACTER(60),
+ruledesign CHARACTER(254) NOT NULL,
+ruledesc CHARACTER(2147483647),
+dataafuse CHARACTER(3),
+mrecentrulecwlu TIMESTAMP,
+rulekey INTEGER NOT NULL,
+distmdkey INTEGER NOT NULL,
+distinterpmdkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (distmdkey) REFERENCES distmd(distmdkey)
+);
+--
+CREATE TABLE distlegendmd(
+areatypename CHARACTER(45),
+areasymbol CHARACTER(20),
+areaname CHARACTER(135),
+ssastatus CHARACTER(254),
+cordate TIMESTAMP,
+exportcertstatus CHARACTER(254),
+exportcertdate TIMESTAMP,
+exportmetadata CHARACTER(2147483647),
+lkey INTEGER NOT NULL,
+distmdkey INTEGER NOT NULL,
+distlegendmdkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (distmdkey) REFERENCES distmd(distmdkey)
+);
+--
+CREATE TABLE laoverlap(
+areatypename CHARACTER(45) NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+areaname CHARACTER(135),
+areaovacres INTEGER,
+lkey INTEGER NOT NULL,
+lareaovkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (lkey) REFERENCES legend(lkey)
+);
+--
+CREATE TABLE legendtext(
+recdate TIMESTAMP,
+legendtextkind CHARACTER(254),
+textcat CHARACTER(20),
+textsubcat CHARACTER(20),
+text CHARACTER(2147483647),
+lkey INTEGER NOT NULL,
+legtextkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (lkey) REFERENCES legend(lkey)
+);
+--
+CREATE TABLE mapunit(
+musym CHARACTER(6) NOT NULL,
+muname CHARACTER(175),
+mukind CHARACTER(254),
+mustatus CHARACTER(254),
+muacres INTEGER,
+mapunitlfw_l INTEGER,
+mapunitlfw_r INTEGER,
+mapunitlfw_h INTEGER,
+mapunitpfa_l REAL,
+mapunitpfa_r REAL,
+mapunitpfa_h REAL,
+farmlndcl CHARACTER(254),
+muhelcl CHARACTER(254),
+muwathelcl CHARACTER(254),
+muwndhelcl CHARACTER(254),
+interpfocus CHARACTER(30),
+invesintens CHARACTER(254),
+iacornsr INTEGER,
+nhiforsoigrp CHARACTER(254),
+nhspiagr REAL,
+vtsepticsyscl CHARACTER(254),
+mucertstat CHARACTER(254),
+lkey INTEGER NOT NULL,
+mukey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (lkey) REFERENCES legend(lkey)
+);
+--
+CREATE TABLE component(
+comppct_l INTEGER,
+comppct_r INTEGER,
+comppct_h INTEGER,
+compname CHARACTER(60),
+compkind CHARACTER(254),
+majcompflag CHARACTER(3),
+otherph CHARACTER(40),
+localphase CHARACTER(40),
+slope_l REAL,
+slope_r REAL,
+slope_h REAL,
+slopelenusle_l INTEGER,
+slopelenusle_r INTEGER,
+slopelenusle_h INTEGER,
+runoff CHARACTER(254),
+tfact INTEGER,
+wei CHARACTER(254),
+weg CHARACTER(254),
+erocl CHARACTER(254),
+earthcovkind1 CHARACTER(254),
+earthcovkind2 CHARACTER(254),
+hydricon CHARACTER(254),
+hydricrating CHARACTER(254),
+drainagecl CHARACTER(254),
+elev_l REAL,
+elev_r REAL,
+elev_h REAL,
+aspectccwise INTEGER,
+aspectrep INTEGER,
+aspectcwise INTEGER,
+geomdesc CHARACTER(2147483647),
+albedodry_l REAL,
+albedodry_r REAL,
+albedodry_h REAL,
+airtempa_l REAL,
+airtempa_r REAL,
+airtempa_h REAL,
+map_l INTEGER,
+map_r INTEGER,
+map_h INTEGER,
+reannualprecip_l INTEGER,
+reannualprecip_r INTEGER,
+reannualprecip_h INTEGER,
+ffd_l INTEGER,
+ffd_r INTEGER,
+ffd_h INTEGER,
+nirrcapcl CHARACTER(254),
+nirrcapscl CHARACTER(254),
+nirrcapunit INTEGER,
+irrcapcl CHARACTER(254),
+irrcapscl CHARACTER(254),
+irrcapunit INTEGER,
+cropprodindex INTEGER,
+constreeshrubgrp CHARACTER(254),
+wndbrksuitgrp CHARACTER(254),
+rsprod_l INTEGER,
+rsprod_r INTEGER,
+rsprod_h INTEGER,
+foragesuitgrpid CHARACTER(11),
+wlgrain CHARACTER(254),
+wlgrass CHARACTER(254),
+wlherbaceous CHARACTER(254),
+wlshrub CHARACTER(254),
+wlconiferous CHARACTER(254),
+wlhardwood CHARACTER(254),
+wlwetplant CHARACTER(254),
+wlshallowwat CHARACTER(254),
+wlrangeland CHARACTER(254),
+wlopenland CHARACTER(254),
+wlwoodland CHARACTER(254),
+wlwetland CHARACTER(254),
+soilslippot CHARACTER(254),
+frostact CHARACTER(254),
+initsub_l INTEGER,
+initsub_r INTEGER,
+initsub_h INTEGER,
+totalsub_l INTEGER,
+totalsub_r INTEGER,
+totalsub_h INTEGER,
+hydgrp CHARACTER(254),
+corcon CHARACTER(254),
+corsteel CHARACTER(254),
+taxclname CHARACTER(120),
+taxorder CHARACTER(254),
+taxsuborder CHARACTER(254),
+taxgrtgroup CHARACTER(254),
+taxsubgrp CHARACTER(254),
+taxpartsize CHARACTER(254),
+taxpartsizemod CHARACTER(254),
+taxceactcl CHARACTER(254),
+taxreaction CHARACTER(254),
+taxtempcl CHARACTER(254),
+taxmoistscl CHARACTER(254),
+taxtempregime CHARACTER(254),
+soiltaxedition CHARACTER(254),
+castorieindex INTEGER,
+flecolcomnum CHARACTER(5),
+flhe CHARACTER(3),
+flphe CHARACTER(3),
+flsoilleachpot CHARACTER(254),
+flsoirunoffpot CHARACTER(254),
+fltemik2use CHARACTER(3),
+fltriumph2use CHARACTER(3),
+indraingrp CHARACTER(3),
+innitrateleachi INTEGER,
+misoimgmtgrp CHARACTER(254),
+vasoimgtgrp CHARACTER(254),
+mukey INTEGER NOT NULL,
+cokey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+--
+CREATE TABLE muaggatt(
+musym CHARACTER(6) NOT NULL,
+muname CHARACTER(175),
+mustatus CHARACTER(254),
+slopegraddcp REAL,
+slopegradwta REAL,
+brockdepmin INTEGER,
+wtdepannmin INTEGER,
+wtdepaprjunmin INTEGER,
+flodfreqdcd CHARACTER(254),
+flodfreqmax CHARACTER(254),
+pondfreqprs CHARACTER(254),
+aws025wta REAL,
+aws050wta REAL,
+aws0100wta REAL,
+aws0150wta REAL,
+drclassdcd CHARACTER(254),
+drclasswettest CHARACTER(254),
+hydgrpdcd CHARACTER(254),
+iccdcd CHARACTER(254),
+iccdcdpct INTEGER,
+niccdcd CHARACTER(254),
+niccdcdpct INTEGER,
+engdwobdcd CHARACTER(254),
+engdwbdcd CHARACTER(254),
+engdwbll CHARACTER(254),
+engdwbml CHARACTER(254),
+engstafdcd CHARACTER(254),
+engstafll CHARACTER(254),
+engstafml CHARACTER(254),
+engsldcd CHARACTER(254),
+engsldcp CHARACTER(254),
+englrsdcd CHARACTER(254),
+engcmssdcd CHARACTER(254),
+engcmssmp CHARACTER(254),
+urbrecptdcd CHARACTER(254),
+urbrecptwta REAL,
+forpehrtdcp CHARACTER(254),
+hydclprs CHARACTER(254),
+awmmfpwwta REAL,
+mukey INTEGER NOT NULL PRIMARY KEY
+);
+--
+CREATE TABLE muaoverlap(
+areaovacres INTEGER,
+lareaovkey INTEGER NOT NULL,
+mukey INTEGER NOT NULL,
+muareaovkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (lareaovkey) REFERENCES laoverlap(lareaovkey),
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+--
+CREATE TABLE mucropyld(
+cropname CHARACTER(254),
+yldunits CHARACTER(254),
+nonirryield_l REAL,
+nonirryield_r REAL,
+nonirryield_h REAL,
+irryield_l REAL,
+irryield_r REAL,
+irryield_h REAL,
+mukey INTEGER NOT NULL,
+mucrpyldkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+--
+CREATE TABLE mutext(
+recdate TIMESTAMP,
+mapunittextkind CHARACTER(254),
+textcat CHARACTER(20),
+textsubcat CHARACTER(20),
+text CHARACTER(2147483647),
+mukey INTEGER NOT NULL,
+mutextkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+--
+CREATE TABLE chorizon(
+hzname CHARACTER(12),
+desgndisc INTEGER,
+desgnmaster CHARACTER(254),
+desgnmasterprime CHARACTER(254),
+desgnvert INTEGER,
+hzdept_l INTEGER,
+hzdept_r INTEGER,
+hzdept_h INTEGER,
+hzdepb_l INTEGER,
+hzdepb_r INTEGER,
+hzdepb_h INTEGER,
+hzthk_l INTEGER,
+hzthk_r INTEGER,
+hzthk_h INTEGER,
+fraggt10_l INTEGER,
+fraggt10_r INTEGER,
+fraggt10_h INTEGER,
+frag3to10_l INTEGER,
+frag3to10_r INTEGER,
+frag3to10_h INTEGER,
+sieveno4_l REAL,
+sieveno4_r REAL,
+sieveno4_h REAL,
+sieveno10_l REAL,
+sieveno10_r REAL,
+sieveno10_h REAL,
+sieveno40_l REAL,
+sieveno40_r REAL,
+sieveno40_h REAL,
+sieveno200_l REAL,
+sieveno200_r REAL,
+sieveno200_h REAL,
+sandtotal_l REAL,
+sandtotal_r REAL,
+sandtotal_h REAL,
+sandvc_l REAL,
+sandvc_r REAL,
+sandvc_h REAL,
+sandco_l REAL,
+sandco_r REAL,
+sandco_h REAL,
+sandmed_l REAL,
+sandmed_r REAL,
+sandmed_h REAL,
+sandfine_l REAL,
+sandfine_r REAL,
+sandfine_h REAL,
+sandvf_l REAL,
+sandvf_r REAL,
+sandvf_h REAL,
+silttotal_l REAL,
+silttotal_r REAL,
+silttotal_h REAL,
+siltco_l REAL,
+siltco_r REAL,
+siltco_h REAL,
+siltfine_l REAL,
+siltfine_r REAL,
+siltfine_h REAL,
+claytotal_l REAL,
+claytotal_r REAL,
+claytotal_h REAL,
+claysizedcarb_l REAL,
+claysizedcarb_r REAL,
+claysizedcarb_h REAL,
+om_l REAL,
+om_r REAL,
+om_h REAL,
+dbtenthbar_l REAL,
+dbtenthbar_r REAL,
+dbtenthbar_h REAL,
+dbthirdbar_l REAL,
+dbthirdbar_r REAL,
+dbthirdbar_h REAL,
+dbfifteenbar_l REAL,
+dbfifteenbar_r REAL,
+dbfifteenbar_h REAL,
+dbovendry_l REAL,
+dbovendry_r REAL,
+dbovendry_h REAL,
+partdensity REAL,
+ksat_l REAL,
+ksat_r REAL,
+ksat_h REAL,
+awc_l REAL,
+awc_r REAL,
+awc_h REAL,
+wtenthbar_l REAL,
+wtenthbar_r REAL,
+wtenthbar_h REAL,
+wthirdbar_l REAL,
+wthirdbar_r REAL,
+wthirdbar_h REAL,
+wfifteenbar_l REAL,
+wfifteenbar_r REAL,
+wfifteenbar_h REAL,
+wsatiated_l INTEGER,
+wsatiated_r INTEGER,
+wsatiated_h INTEGER,
+lep_l REAL,
+lep_r REAL,
+lep_h REAL,
+ll_l REAL,
+ll_r REAL,
+ll_h REAL,
+pi_l REAL,
+pi_r REAL,
+pi_h REAL,
+aashind_l INTEGER,
+aashind_r INTEGER,
+aashind_h INTEGER,
+kwfact CHARACTER(254),
+kffact CHARACTER(254),
+caco3_l INTEGER,
+caco3_r INTEGER,
+caco3_h INTEGER,
+gypsum_l INTEGER,
+gypsum_r INTEGER,
+gypsum_h INTEGER,
+sar_l REAL,
+sar_r REAL,
+sar_h REAL,
+ec_l REAL,
+ec_r REAL,
+ec_h REAL,
+cec7_l REAL,
+cec7_r REAL,
+cec7_h REAL,
+ecec_l REAL,
+ecec_r REAL,
+ecec_h REAL,
+sumbases_l REAL,
+sumbases_r REAL,
+sumbases_h REAL,
+ph1to1h2o_l REAL,
+ph1to1h2o_r REAL,
+ph1to1h2o_h REAL,
+ph01mcacl2_l REAL,
+ph01mcacl2_r REAL,
+ph01mcacl2_h REAL,
+freeiron_l REAL,
+freeiron_r REAL,
+freeiron_h REAL,
+feoxalate_l REAL,
+feoxalate_r REAL,
+feoxalate_h REAL,
+extracid_l REAL,
+extracid_r REAL,
+extracid_h REAL,
+extral_l REAL,
+extral_r REAL,
+extral_h REAL,
+aloxalate_l REAL,
+aloxalate_r REAL,
+aloxalate_h REAL,
+pbray1_l REAL,
+pbray1_r REAL,
+pbray1_h REAL,
+poxalate_l REAL,
+poxalate_r REAL,
+poxalate_h REAL,
+ph2osoluble_l REAL,
+ph2osoluble_r REAL,
+ph2osoluble_h REAL,
+ptotal_l REAL,
+ptotal_r REAL,
+ptotal_h REAL,
+excavdifcl CHARACTER(254),
+excavdifms CHARACTER(254),
+cokey INTEGER NOT NULL,
+chkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cocanopycover(
+plantcov INTEGER,
+plantsym CHARACTER(8) NOT NULL,
+plantsciname CHARACTER(127),
+plantcomname CHARACTER(60),
+cokey INTEGER NOT NULL,
+cocanopycovkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cocropyld(
+cropname CHARACTER(254),
+yldunits CHARACTER(254),
+nonirryield_l REAL,
+nonirryield_r REAL,
+nonirryield_h REAL,
+irryield_l REAL,
+irryield_r REAL,
+irryield_h REAL,
+cropprodindex INTEGER,
+vasoiprdgrp CHARACTER(254),
+cokey INTEGER NOT NULL,
+cocropyldkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE codiagfeatures(
+featkind CHARACTER(254),
+featdept_l INTEGER,
+featdept_r INTEGER,
+featdept_h INTEGER,
+featdepb_l INTEGER,
+featdepb_r INTEGER,
+featdepb_h INTEGER,
+featthick_l INTEGER,
+featthick_r INTEGER,
+featthick_h INTEGER,
+cokey INTEGER NOT NULL,
+codiagfeatkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE coecoclass(
+ecoclasstypename CHARACTER(60) NOT NULL,
+ecoclassref CHARACTER(254),
+ecoclassid CHARACTER(30) NOT NULL,
+ecoclassname CHARACTER(2147483647),
+cokey INTEGER NOT NULL,
+coecoclasskey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE coerosionacc(
+erokind CHARACTER(254),
+rvindicator CHARACTER(3) NOT NULL,
+cokey INTEGER NOT NULL,
+coeroacckey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE coeplants(
+plantsym CHARACTER(8) NOT NULL,
+plantsciname CHARACTER(127),
+plantcomname CHARACTER(60),
+forestunprod INTEGER,
+rangeprod INTEGER,
+cokey INTEGER NOT NULL,
+coeplantskey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE coforprod(
+plantsym CHARACTER(8) NOT NULL,
+plantsciname CHARACTER(127),
+plantcomname CHARACTER(60),
+siteindexbase CHARACTER(254),
+siteindex_l INTEGER,
+siteindex_r INTEGER,
+siteindex_h INTEGER,
+fprod_l REAL,
+fprod_r REAL,
+fprod_h REAL,
+cokey INTEGER NOT NULL,
+cofprodkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cogeomordesc(
+geomftname CHARACTER(30) NOT NULL,
+geomfname CHARACTER(50) NOT NULL,
+geomfmod CHARACTER(60),
+geomfeatid INTEGER,
+existsonfeat INTEGER,
+rvindicator CHARACTER(3) NOT NULL,
+cokey INTEGER NOT NULL,
+cogeomdkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cohydriccriteria(
+hydriccriterion CHARACTER(254),
+cokey INTEGER NOT NULL,
+cohydcritkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cointerp(
+cokey INTEGER NOT NULL,
+mrulekey INTEGER NOT NULL,
+mrulename CHARACTER(60) NOT NULL,
+seqnum INTEGER NOT NULL,
+rulekey INTEGER NOT NULL,
+rulename CHARACTER(60) NOT NULL,
+ruledepth INTEGER NOT NULL,
+interpll REAL,
+interpllc CHARACTER(254),
+interplr REAL,
+interplrc CHARACTER(254),
+interphr REAL,
+interphrc CHARACTER(254),
+interphh REAL,
+interphhc CHARACTER(254),
+nullpropdatabool CHARACTER(3),
+defpropdatabool CHARACTER(3),
+incpropdatabool CHARACTER(3),
+cointerpkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE comonth(
+monthseq INTEGER,
+month CHARACTER(254),
+flodfreqcl CHARACTER(254),
+floddurcl CHARACTER(254),
+pondfreqcl CHARACTER(254),
+ponddurcl CHARACTER(254),
+ponddep_l INTEGER,
+ponddep_r INTEGER,
+ponddep_h INTEGER,
+dlyavgprecip_l INTEGER,
+dlyavgprecip_r INTEGER,
+dlyavgprecip_h INTEGER,
+dlyavgpotet_l INTEGER,
+dlyavgpotet_r INTEGER,
+dlyavgpotet_h INTEGER,
+cokey INTEGER NOT NULL,
+comonthkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE copmgrp(
+pmgroupname CHARACTER(252),
+rvindicator CHARACTER(3) NOT NULL,
+cokey INTEGER NOT NULL,
+copmgrpkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE copwindbreak(
+wndbrkht_l REAL,
+wndbrkht_r REAL,
+wndbrkht_h REAL,
+plantsym CHARACTER(8) NOT NULL,
+plantsciname CHARACTER(127),
+plantcomname CHARACTER(60),
+cokey INTEGER NOT NULL,
+copwindbreakkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE corestrictions(
+reskind CHARACTER(254),
+reshard CHARACTER(254),
+resdept_l INTEGER,
+resdept_r INTEGER,
+resdept_h INTEGER,
+resdepb_l INTEGER,
+resdepb_r INTEGER,
+resdepb_h INTEGER,
+resthk_l INTEGER,
+resthk_r INTEGER,
+resthk_h INTEGER,
+cokey INTEGER NOT NULL,
+corestrictkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cosurffrags(
+sfragcov_l REAL,
+sfragcov_r REAL,
+sfragcov_h REAL,
+distrocks_l REAL,
+distrocks_r REAL,
+distrocks_h REAL,
+sfragkind CHARACTER(254),
+sfragsize_l INTEGER,
+sfragsize_r INTEGER,
+sfragsize_h INTEGER,
+sfragshp CHARACTER(254),
+sfraground CHARACTER(254),
+sfraghard CHARACTER(254),
+cokey INTEGER NOT NULL,
+cosurffragskey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cotaxfmmin(
+taxminalogy CHARACTER(254),
+cokey INTEGER NOT NULL,
+cotaxfmminkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cotxfmother(
+taxfamother CHARACTER(254),
+cokey INTEGER NOT NULL,
+cotaxfokey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cotaxmoistcl(
+taxmoistcl CHARACTER(254),
+cokey INTEGER NOT NULL,
+cotaxmckey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cotext(
+recdate TIMESTAMP,
+comptextkind CHARACTER(254),
+textcat CHARACTER(20),
+textsubcat CHARACTER(20),
+text CHARACTER(2147483647),
+cokey INTEGER NOT NULL,
+cotextkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE cotreestomng(
+plantsym CHARACTER(8) NOT NULL,
+plantsciname CHARACTER(127),
+plantcomname CHARACTER(60),
+cokey INTEGER NOT NULL,
+cotreestomngkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+);
+--
+CREATE TABLE chaashto(
+aashtocl CHARACTER(254),
+rvindicator CHARACTER(3) NOT NULL,
+chkey INTEGER NOT NULL,
+chaashtokey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chconsistence(
+rupresblkmst CHARACTER(254),
+rupresblkdry CHARACTER(254),
+rupresblkcem CHARACTER(254),
+rupresplate CHARACTER(254),
+mannerfailure CHARACTER(254),
+stickiness CHARACTER(254),
+plasticity CHARACTER(254),
+rvindicator CHARACTER(3) NOT NULL,
+chkey INTEGER NOT NULL,
+chconsistkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chdesgnsuffix(
+desgnsuffix CHARACTER(254),
+chkey INTEGER NOT NULL,
+chdesgnsfxkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chfrags(
+fragvol_l INTEGER,
+fragvol_r INTEGER,
+fragvol_h INTEGER,
+fragkind CHARACTER(254),
+fragsize_l INTEGER,
+fragsize_r INTEGER,
+fragsize_h INTEGER,
+fragshp CHARACTER(254),
+fraground CHARACTER(254),
+fraghard CHARACTER(254),
+chkey INTEGER NOT NULL,
+chfragskey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chpores(
+poreqty_l REAL,
+poreqty_r REAL,
+poreqty_h REAL,
+poresize CHARACTER(254),
+porecont CHARACTER(254),
+poreshp CHARACTER(254),
+rvindicator CHARACTER(3) NOT NULL,
+chkey INTEGER NOT NULL,
+chporeskey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chstructgrp(
+structgrpname CHARACTER(100),
+rvindicator CHARACTER(3) NOT NULL,
+chkey INTEGER NOT NULL,
+chstructgrpkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chtext(
+recdate TIMESTAMP,
+chorizontextkind CHARACTER(254),
+textcat CHARACTER(20),
+textsubcat CHARACTER(20),
+text CHARACTER(2147483647),
+chkey INTEGER NOT NULL,
+chtextkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chtexturegrp(
+texture CHARACTER(30),
+stratextsflag CHARACTER(3) NOT NULL,
+rvindicator CHARACTER(3) NOT NULL,
+texdesc CHARACTER(2147483647),
+chkey INTEGER NOT NULL,
+chtgkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE chunified(
+unifiedcl CHARACTER(254),
+rvindicator CHARACTER(3) NOT NULL,
+chkey INTEGER NOT NULL,
+chunifiedkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chkey) REFERENCES chorizon(chkey)
+);
+--
+CREATE TABLE coforprodo(
+siteindexbase CHARACTER(254),
+siteindex_l INTEGER,
+siteindex_r INTEGER,
+siteindex_h INTEGER,
+fprod_l REAL,
+fprod_r REAL,
+fprod_h REAL,
+fprodunits CHARACTER(254),
+cofprodkey INTEGER NOT NULL,
+cofprodokey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cofprodkey) REFERENCES coforprod(cofprodkey)
+);
+--
+CREATE TABLE copm(
+pmorder INTEGER,
+pmmodifier CHARACTER(254),
+pmgenmod CHARACTER(60),
+pmkind CHARACTER(254),
+pmorigin CHARACTER(254),
+copmgrpkey INTEGER NOT NULL,
+copmkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (copmgrpkey) REFERENCES copmgrp(copmgrpkey)
+);
+--
+CREATE TABLE cosoilmoist(
+soimoistdept_l INTEGER,
+soimoistdept_r INTEGER,
+soimoistdept_h INTEGER,
+soimoistdepb_l INTEGER,
+soimoistdepb_r INTEGER,
+soimoistdepb_h INTEGER,
+soimoiststat CHARACTER(254),
+comonthkey INTEGER NOT NULL,
+cosoilmoistkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (comonthkey) REFERENCES comonth(comonthkey)
+);
+--
+CREATE TABLE cosoiltemp(
+soitempmm INTEGER,
+soitempdept_l INTEGER,
+soitempdept_r INTEGER,
+soitempdept_h INTEGER,
+soitempdepb_l INTEGER,
+soitempdepb_r INTEGER,
+soitempdepb_h INTEGER,
+comonthkey INTEGER NOT NULL,
+cosoiltempkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (comonthkey) REFERENCES comonth(comonthkey)
+);
+--
+CREATE TABLE cosurfmorphgc(
+geomposmntn CHARACTER(254),
+geomposhill CHARACTER(254),
+geompostrce CHARACTER(254),
+geomposflats CHARACTER(254),
+cogeomdkey INTEGER NOT NULL,
+cosurfmorgckey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey)
+);
+--
+CREATE TABLE cosurfmorphhpp(
+hillslopeprof CHARACTER(254),
+cogeomdkey INTEGER NOT NULL,
+cosurfmorhppkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey)
+);
+--
+CREATE TABLE cosurfmorphmr(
+geomicrorelief CHARACTER(254),
+cogeomdkey INTEGER NOT NULL,
+cosurfmormrkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey)
+);
+--
+CREATE TABLE cosurfmorphss(
+shapeacross CHARACTER(254),
+shapedown CHARACTER(254),
+cogeomdkey INTEGER NOT NULL,
+cosurfmorsskey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey)
+);
+--
+CREATE TABLE chstruct(
+structgrade CHARACTER(254),
+structsize CHARACTER(254),
+structtype CHARACTER(254),
+structid INTEGER,
+structpartsto INTEGER,
+chstructgrpkey INTEGER NOT NULL,
+chstructkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chstructgrpkey) REFERENCES chstructgrp(chstructgrpkey)
+);
+--
+CREATE TABLE chtexture(
+texcl CHARACTER(254),
+lieutex CHARACTER(254),
+chtgkey INTEGER NOT NULL,
+chtkey INTEGER NOT NULL PRIMARY KEY, 
+FOREIGN KEY (chtgkey) REFERENCES chtexturegrp(chtgkey)
+);
+--
+CREATE TABLE chtexturemod(
+texmod CHARACTER(254),
+chtkey INTEGER NOT NULL,
+chtexmodkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (chtkey) REFERENCES chtexture(chtkey)
+);
+--
+CREATE TABLE featdesc(
+areasymbol CHARACTER(20) NOT NULL,
+spatialversion INTEGER NOT NULL,
+featsym CHARACTER(3) NOT NULL,
+featname CHARACTER(80) NOT NULL,
+featdesc CHARACTER(2147483647) NOT NULL,
+featkey INTEGER NOT NULL PRIMARY KEY
+);
+--
+CREATE TABLE mdstatdommas(
+domainname CHARACTER(40) NOT NULL,
+domainmaxlen INTEGER NOT NULL,
+PRIMARY KEY (domainname) 
+);
+--
+CREATE TABLE mdstatdomdet(
+domainname CHARACTER(40) NOT NULL,
+choicesequence INTEGER NOT NULL,
+choice CHARACTER(254) NOT NULL,
+choicedesc CHARACTER(2147483647),
+choiceobsolete CHARACTER(3) NOT NULL,
+PRIMARY KEY (domainname, choicesequence),
+FOREIGN KEY (domainname) REFERENCES mdstatdommas(domainname)
+);
+--
+CREATE TABLE mdstatidxmas(
+tabphyname CHARACTER(30) NOT NULL,
+idxphyname CHARACTER(30) NOT NULL,
+uniqueindex CHARACTER(3) NOT NULL,
+PRIMARY KEY (tabphyname, idxphyname),
+FOREIGN KEY (tabphyname) REFERENCES mdstattabs(tabphyname)
+);
+--
+CREATE TABLE mdstatidxdet(
+tabphyname CHARACTER(30) NOT NULL,
+idxphyname CHARACTER(30) NOT NULL,
+idxcolsequence INTEGER NOT NULL,
+colphyname CHARACTER(30) NOT NULL,
+PRIMARY KEY (tabphyname, idxphyname, idxcolsequence),
+FOREIGN KEY (tabphyname, idxphyname) REFERENCES mdstatidxmas(tabphyname, idxphyname)
+);
+--
+CREATE TABLE mdstatrshipmas(
+ltabphyname CHARACTER(30) NOT NULL,
+rtabphyname CHARACTER(30) NOT NULL,
+relationshipname CHARACTER(30) NOT NULL,
+cardinality CHARACTER(254) NOT NULL,
+mandatory CHARACTER(3) NOT NULL,
+PRIMARY KEY (ltabphyname, rtabphyname, relationshipname),
+FOREIGN KEY (ltabphyname) REFERENCES mdstattabs(tabphyname),
+FOREIGN KEY (rtabphyname) REFERENCES mdstattabs(tabphyname)
+);
+--
+CREATE TABLE mdstatrshipdet(
+ltabphyname CHARACTER(30) NOT NULL,
+rtabphyname CHARACTER(30) NOT NULL,
+relationshipname CHARACTER(30) NOT NULL,
+ltabcolphyname CHARACTER(30) NOT NULL,
+rtabcolphyname CHARACTER(30) NOT NULL,
+PRIMARY KEY (ltabphyname, rtabphyname, relationshipname, ltabcolphyname, rtabcolphyname),
+FOREIGN KEY (ltabphyname, rtabphyname, relationshipname) REFERENCES mdstatrshipmas(ltabphyname, rtabphyname, relationshipname)
+);
+--
+CREATE TABLE mdstattabs(
+tabphyname CHARACTER(30) NOT NULL UNIQUE,
+tablogname CHARACTER(30) NOT NULL UNIQUE,
+tablabel CHARACTER(80) NOT NULL UNIQUE,
+tabdesc CHARACTER(2147483647) NOT NULL,
+iefilename CHARACTER(30) NOT NULL,
+daglevel INTEGER,
+PRIMARY KEY (tabphyname) 
+);
+--
+CREATE TABLE mdstattabcols(
+tabphyname CHARACTER(30) NOT NULL,
+colsequence INTEGER NOT NULL,
+colphyname CHARACTER(30) NOT NULL,
+collogname CHARACTER(30) NOT NULL,
+collabel CHARACTER(80) NOT NULL,
+logicaldatatype CHARACTER(254) NOT NULL,
+notnull_ CHARACTER(3) NOT NULL,
+fieldsize INTEGER,
+precision INTEGER,
+minimum REAL,
+maximum REAL,
+uom CHARACTER(60),
+domainname CHARACTER(40),
+coldesc CHARACTER(2147483647) NOT NULL,
+PRIMARY KEY (tabphyname, colsequence),
+FOREIGN KEY (tabphyname) REFERENCES mdstattabs(tabphyname),
+FOREIGN KEY (domainname) REFERENCES mdstatdommas(domainname)
+);
+--
+CREATE TABLE month(
+monthseq INTEGER NOT NULL PRIMARY KEY,
+monthname CHARACTER(9) NOT NULL
+);
+--
+CREATE TABLE sdvalgorithm(
+algorithmsequence INTEGER NOT NULL PRIMARY KEY,
+algorithmname CHARACTER(50) NOT NULL UNIQUE,
+algorithminitials CHARACTER(3) NOT NULL,
+algorithmdescription CHARACTER(2147483647) NOT NULL
+);
+--
+CREATE TABLE sdvattribute(
+attributekey INTEGER NOT NULL PRIMARY KEY,
+attributename CHARACTER(60) NOT NULL UNIQUE,
+attributetablename CHARACTER(30) NOT NULL,
+attributecolumnname CHARACTER(30) NOT NULL,
+attributelogicaldatatype CHARACTER(20) NOT NULL,
+attributefieldsize INTEGER,
+attributeprecision INTEGER,
+attributedescription CHARACTER(2147483647) NOT NULL,
+attributeuom CHARACTER(60),
+attributeuomabbrev CHARACTER(30),
+attributetype CHARACTER(20) NOT NULL,
+nasisrulename CHARACTER(60),
+ruledesign INTEGER,
+notratedphrase CHARACTER(254),
+mapunitlevelattribflag INTEGER NOT NULL,
+complevelattribflag INTEGER NOT NULL,
+cmonthlevelattribflag INTEGER NOT NULL,
+horzlevelattribflag INTEGER NOT NULL,
+tiebreakdomainname CHARACTER(40),
+tiebreakruleoptionflag INTEGER NOT NULL,
+tiebreaklowlabel CHARACTER(20),
+tiebreakhighlabel CHARACTER(20),
+tiebreakrule INTEGER NOT NULL,
+resultcolumnname CHARACTER(10) NOT NULL,
+sqlwhereclause CHARACTER(255),
+primaryconcolname CHARACTER(30),
+pcclogicaldatatype CHARACTER(20),
+primaryconstraintlabel CHARACTER(30),
+secondaryconcolname CHARACTER(30),
+scclogicaldatatype CHARACTER(20),
+secondaryconstraintlabel CHARACTER(30),
+dqmodeoptionflag INTEGER NOT NULL,
+depthqualifiermode CHARACTER(20),
+layerdepthtotop REAL,
+layerdepthtobottom REAL,
+layerdepthuom CHARACTER(20),
+monthrangeoptionflag INTEGER NOT NULL,
+beginningmonth CHARACTER(9),
+endingmonth CHARACTER(9),
+horzaggmeth CHARACTER(30) NOT NULL,
+interpnullsaszerooptionflag INTEGER NOT NULL,
+interpnullsaszeroflag INTEGER NOT NULL,
+nullratingreplacementvalue CHARACTER(254),
+basicmodeflag INTEGER NOT NULL,
+maplegendkey INTEGER NOT NULL,
+maplegendclasses INTEGER,
+maplegendxml CHARACTER(2147483647) NOT NULL,
+nasissiteid INTEGER NOT NULL,
+wlupdated TIMESTAMP NOT NULL,
+algorithmname CHARACTER(50) NOT NULL,
+componentpercentcutoff INTEGER,
+readytodistribute INTEGER NOT NULL,
+effectivelogicaldatatype CHARACTER(20) NOT NULL
+);
+--
+CREATE TABLE sdvfolder(
+foldersequence INTEGER NOT NULL,
+foldername CHARACTER(80) NOT NULL UNIQUE,
+folderdescription CHARACTER(2147483647) NOT NULL,
+folderkey INTEGER NOT NULL PRIMARY KEY,
+parentfolderkey INTEGER,
+wlupdated TIMESTAMP NOT NULL
+);
+--
+CREATE TABLE sdvfolderattribute(
+folderkey INTEGER NOT NULL,
+attributekey INTEGER NOT NULL,
+PRIMARY KEY (folderkey, attributekey),
+FOREIGN KEY (folderkey) REFERENCES sdvfolder(folderkey),
+FOREIGN KEY (attributekey) REFERENCES sdvattribute(attributekey)
+);
+--
+--
+-- The following tables are not standard SSURGO soil attribute or metadata tables
+-- system_templatedatabaseinformation table contains settings and history for SSURGO template database
+-- Spatial tables will need to be updated using Spatialite to enable spatial functionality.
+--
+CREATE TABLE system_templatedatabaseinformation(
+Item_Name CHARACTER (60) NOT NULL,
+Item_Sequence INTEGER NOT NULL PRIMARY KEY,
+Item_Value CHARACTER (50),
+Item_Narrative CHARACTER (2147483647)
+);
+--
+CREATE TABLE featline(
+objectid INTEGER NOT NULL PRIMARY KEY,
+shape LINESTRING NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+spatialver INTEGER NOT NULL,
+featsym CHARACTER(3) NOT NULL,
+featkey INTEGER NOT NULL,
+FOREIGN KEY (featkey) REFERENCES featdesc(featkey)
+);
+--
+CREATE TABLE featpoint(
+objectid INTEGER NOT NULL PRIMARY KEY,
+shape POINT NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+spatialver INTEGER NOT NULL,
+featsym CHARACTER(3) NOT NULL,
+featkey INTEGER NOT NULL,
+FOREIGN KEY (featkey) REFERENCES featdesc(featkey)
+);
+--
+CREATE TABLE muline(
+objectid INTEGER NOT NULL PRIMARY KEY,
+shape LINESTRING NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+spatialver INTEGER NOT NULL,
+musym CHARACTER(6) NOT NULL,
+mukey INTEGER NOT NULL, 
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey),
+)
+--
+CREATE TABLE mupoint(
+objectid INTEGER NOT NULL PRIMARY KEY,
+shape POINT NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+spatialver INTEGER NOT NULL,
+musym CHARACTER(6) NOT NULL,
+mukey INTEGER NOT NULL,
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+--
+CREATE TABLE mupolygon(
+objectid INTEGER NOT NULL PRIMARY KEY,
+shape MULTIPOLYGON NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+spatialver INTEGER NOT NULL,
+musym CHARACTER(6) NOT NULL,
+mukey INTEGER,
+FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+--
+CREATE TABLE sapolygon(
+objectid INTEGER NOT NULL PRIMARY KEY,
+shape MULTIPOLYGON NOT NULL,
+areasymbol CHARACTER(20) NOT NULL,
+spatialver INTEGER NOT NULL,
+lkey INTEGER NOT NULL,
+FOREIGN KEY (lkey) REFERENCES sacatalog(sacatalogkey)
+);
+---- End of Create Table Queries 

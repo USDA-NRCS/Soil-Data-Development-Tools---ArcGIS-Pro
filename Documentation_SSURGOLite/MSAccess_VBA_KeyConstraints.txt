@@ -1,0 +1,191 @@
+
+Function ListAllKeys() As String
+  ' List all keys. Try to identify foreign keys.
+  '
+  'Must reference ADOX library:
+  'Microsoft ADO Ext. 2.8 for DDL and Security.
+
+
+  Dim cat As New ADOX.Catalog
+  Dim tbl As New ADOX.Table
+  Dim idxADOX As New ADOX.Index
+  Dim col As New ADOX.column
+  Dim msg As String
+  Dim prefix As String
+  Dim tblName As String
+  Dim keyCollection As ADOX.Keys
+  Dim key As New ADOX.key
+  Dim keyCount As Integer
+  Dim keyID As Integer
+  Dim keyType As String
+  Dim primaryKeys As String
+  Dim parentKeys As String
+  Dim childKeys As String
+  Dim uniqueKeys As String
+  Dim updateID As Integer
+  Dim updateRule As String
+  Dim deleteID As Integer
+  Dim deleteRule As String
+  Dim keyName As String
+  Dim relatedColumn As String
+  Dim relatedTable As String
+  Dim i As Integer
+  
+  cat.ActiveConnection = CurrentProject.AccessConnection
+  
+  On Error GoTo errHandler
+
+  For Each tbl In cat.Tables
+    primaryKeys = ""
+    foreignKeys = ""
+    parentKeys = ""
+    childKeys = ""
+    updateRule = ""
+    uniqueKeys = ""
+    
+    tblName = tbl.Name
+    prefix = Left(tblName, 4)
+    
+    If prefix <> "MSys" And prefix <> "SYST" Then
+      'msg = "'" & tblName & "'" & "-->"
+      'Debug.Print msg
+      
+      For Each key In tbl.Keys
+        ' key types are 1:primary, 2:foreign, 3:unique
+        ' .UpdateRule: 1:Cascade changes, 2: Foreign key is set to null, 3: Foreign key is set to default, 0: No action taken
+        keyID = key.Type
+        keyName = key.Name
+        deleteID = key.deleteRule
+        
+        Select Case deleteID
+          Case 0
+            deleteRule = "No action"
+          Case 1
+            deleteRule = "Cascade changes"
+          Case 2
+            deleteRule = "Foreign key set to null"
+          Case 3
+            deleteRule = "Foreign key is set to default"
+          Case Else
+            deleteRule = "Error with key constraint"
+        End Select
+        updateID = key.updateRule
+
+        Select Case updateID
+          Case 0
+            updateRule = "No action"
+          Case 1
+            updateRule = "Cascade changes"
+          Case 2
+            updateRule = "Foreign key set to null"
+          Case 3
+            updateRule = "Foreign key is set to default"
+          Case Else
+            updateRule = "Error with key constraint"
+        End Select
+
+        Select Case keyID
+          Case 1
+            keyType = "Primary Key"
+          Case 2
+            keyType = "Foreign Key"
+          Case 3
+            keyType = "Unique Key"
+          Case Else
+            keyType = "Unknown Constraint"
+        End Select
+ 
+            
+        If keyID = 1 Then
+          ' Primary Key
+            
+          i = 0
+          
+          For Each col In key.Columns
+            i = i + 1
+              
+            If i = 1 Then
+              primaryKeys = col.Name
+                
+            Else
+              primaryKeys = primaryKeys + ", " & col.Name
+                
+            End If
+              
+            Next
+              
+          msg = tbl.Name & ": " & keyType & " (" & primaryKeys & ") " & col.Name
+          Debug.Print msg
+            
+        ElseIf key.Type = 2 Then
+          ' Foreign Key
+          i = 0
+          relatedTable = key.relatedTable
+
+          For Each col In key.Columns
+            i = i + 1
+            relatedColumn = col.relatedColumn
+            
+            If i = 1 Then
+              parentKeys = col.Name
+              childKeys = relatedColumn
+                
+            Else
+              parentKeys = parentKeys & ", " & col.Name
+              childKeys = childKeys & ", " & relatedColumn
+                
+            End If
+              
+            Next
+              
+          msg = tbl.Name & ": " & keyType & " (" & parentKeys & ") REFERENCES " & relatedTable & "(" & childKeys & ")"
+          
+          If deleteID = 1 Then
+            msg = msg & " ON DELETE CASCADE"
+          End If
+            
+          Debug.Print msg
+            
+        ElseIf key.Type = 3 Then
+          ' Unique Key
+
+          i = 0
+          
+          For Each col In key.Columns
+            i = i + 1
+              
+            If i = 1 Then
+              uniqueKeys = col.Name
+                
+            Else
+              uniqueKeys = uniqueKeys + ", " & col.Name
+                
+            End If
+              
+            Next
+              
+          msg = tbl.Name & " " & keyType & " (" & uniqueKeys & ") " & col.Name
+          Debug.Print msg
+           
+        End If
+          
+        Next
+
+    End If
+    
+    Next
+
+  Set cat = Nothing
+  Set tbl = Nothing
+  Set idxADOX = Nothing
+  Set col = Nothing
+
+  Exit Function
+
+errHandler:    MsgBox Err.Number & ": " & Err.Description, vbOKOnly, "Error"
+  Set cat = Nothing
+  Set tbl = Nothing
+  Set idxADOX = Nothing
+  Set col = Nothing
+
+End Function

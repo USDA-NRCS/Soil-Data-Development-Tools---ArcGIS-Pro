@@ -1,0 +1,60 @@
+# Get driver for all input shapefiles
+# Monday morning, I moved this back up to the top, before iterating through different feature types.
+import os;
+from osgeo import ogr;
+p = r"D:\Geodata\2021\SSURGO_Downloads\soil_ks023\spatial";
+shp = "soilmu_a_ks023.shp";
+shpFile = os.path.join(p, shp);
+shpDriver = ogr.GetDriverByName("ESRI Shapefile");
+
+if shpDriver is None:
+    err = "Failed to get OGR inputDriver for shapefile"
+    raise MyError(err)
+
+for shpFile in mupolyList:
+
+    dsShape = shpDriver.Open(shpFile)
+    inLayer = dsShape.GetLayer()
+
+    # Get count of input features
+    featCnt = inLayer.GetFeatureCount()
+
+    # Get input field information
+    # This seems like it could be redundant information. 
+    # All soilmu_a* shapefiles should be the same?
+    #
+
+    firstLayerDefn = inLayer.GetLayerDefn()
+    inFldCount = firstLayerDefn.GetFieldCount()
+    inFieldDefs = list()
+    for i in range(inFldCount):
+
+    for inFeature in inLayer:
+# iterate through all records in this input shapefile
+# should be [areasymbol, spatialver, musym, mukey]
+# Seems that ogr layer definition skips objectid and shape fields, 
+# which is probably a good thing.
+# 
+geom = inFeature.GetGeometryRef()
+vals = [ inFeature.GetField(i)) for i in inFldCount ]
+PrintMsg(".\tGeom: " + str(geom), 1)
+PrintMsg(".\tAtts: " + str(vals), 1)
+
+
+TEST BELOW:
+
+inFldCount = firstLayerDefn.GetFieldCount()
+inFldCount
+4
+fldDef = firstLayerDefn.GetFieldDefn(0)
+fldDef.GetName()
+'AREASYMBOL'
+inFeature = inLayer[0]
+geom = inFeature.GetGeometryRef()
+print(str(geom))
+POLYGON ((-101.532999534485 39.7623782143908,-101.532671321505 39.7624213136989,-101.532110402481 39.7626141369967,-101.531762190536 39.762765385689,-101.53111505657 39.7630952029169,-101.530537554069 39.7634407149457,-101.53033894097 39.7635889313384,-101.529834356859 39.7641770453087,-101.529733496296 39.7644764858148,-101.529640900038 39.765190333927,-101.529569148831 39.7654080380548,-101.529497658856 39.7660127920475,-101.529384007289 39.7664835329484,-101.529340600585 39.7668090426937,-101.529254848979 39.7672436899286,-101.529147554885 39.7674441903006,-101.528906147506 39.7678186630718,-101.528784581524 39.7679563254898,-101.528572332391 39.7680962012757,-101.528386844625 39.7681544443164,-101.528144879102 39.7681686957616,-101.5278759027 39.7681385491876,-101.527647994119 39.7680440168639,-101.527477947112 39.7679040241158,-101.527363674767 39.767645362971,-101.527292331353 39.7673311736898,-101.527285764335 39.7670615038947,-101.527222072701 39.7666933428119,-101.527223470191 39.7658825091111,-101.527138734608 39.7650102203381,-101.527267732764 39.7641249274674,-101.527316061918 39.763970831624,-101.527487461676 39.7636066021238,-101.527843298839 39.7630938919798,-101.528143362234 39.762699849235,-101.52842074938 39.7623792125657,-101.529273990057 39.761783762996,-101.529602442014 39.7616056823667,-101.53004204616 39.7614155434301,-101.531002481397 39.7610790517284,-101.531763230575 39.7608461233546,-101.532047863915 39.7608040565559,-101.532410820736 39.7608139526284,-101.532744054787 39.7608975666695,-101.532964138769 39.7609826013451,-101.533113733098 39.7610868391208,-101.533283610553 39.7613627049313,-101.533334269369 39.7615151134355,-101.533354974197 39.7616768900464,-101.533320240932 39.7619921854117,-101.533170535945 39.7622392580752,-101.532999534485 39.7623782143908))
+
+
+Question. Do I need to convert the shapefile's WKT Geometry to something else for the sqlite cursor?
+
+

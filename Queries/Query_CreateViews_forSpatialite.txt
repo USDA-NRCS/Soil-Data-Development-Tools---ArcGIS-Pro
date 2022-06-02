@@ -1,0 +1,32 @@
+-- view_muname
+CREATE VIEW view_muname AS SELECT
+M.objectid, M.shape, M.areasymbol, M.spatialver, M.musym, M.mukey, R.muname
+FROM MUPOLYGON M
+INNER JOIN mapunit R ON M.mukey = R.mukey
+ORDER BY M.objectid ASC;
+
+-- view_mupolyextended
+CREATE VIEW view_mupolyextended AS SELECT
+M.objectid, M.shape, M.areasymbol, M.spatialver, M.musym, M.mukey, G.muname,
+G.slopegradwta, G.brockdepmin, G.aws025wta, G.drclassdcd, G.hydgrpdcd, G.niccdcd, G.hydclprs
+FROM MUPOLYGON M
+INNER JOIN muaggatt G ON M.mukey = G.mukey
+ORDER BY M.objectid ASC;
+
+
+
+-- These registrations are for Spatialite databases only
+-- register view_muname for spatialite
+INSERT INTO views_geometry_columns (view_name, view_geometry, view_rowid, f_table_name, f_geometry_column, read_only) 
+VALUES ('view_muname', 'shape', 'objectid', 'mupolygon', 'shape', 1);
+
+-- register view_mupolyextended for spatialite
+INSERT INTO views_geometry_columns (view_name, view_geometry, view_rowid, f_table_name, f_geometry_column, read_only) 
+VALUES ('view_mupolyextended', 'shape', 'objectid', 'mupolygon', 'shape', 1);
+
+
+-- These registrations are for Geopackage databases only
+-- 
+-- INSERT INTO gpkg_contents (table_name, data_type, identifier, description) VALUES ('view_muname', 'features', 'view_muname', 'Layer description goes here');
+-- INSERT INTO gpkg_contents (table_name, data_type, identifier, description) VALUES ('view_mupolyextended', 'features', 'view_mupolyextended', 'Layer description goes here');
+

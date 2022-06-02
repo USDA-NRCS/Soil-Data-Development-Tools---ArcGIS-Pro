@@ -1,0 +1,112 @@
+' VBA code module for 
+Option Compare Database
+
+Function ListPK() As String
+  'Using table indexes, list primary keys for soil attribute tables. Skip MSys* tables.
+  'Must reference ADOX library:
+  'Microsoft ADO Ext. 2.8 for DDL and Security.
+
+  Dim cat As New ADOX.Catalog
+  Dim tblADOX As New ADOX.Table
+  Dim idxADOX As New ADOX.Index
+  Dim colADOX As New ADOX.column
+  Dim msg As String
+  cat.ActiveConnection = CurrentProject.AccessConnection
+  On Error GoTo errHandler
+  
+  'ListPK = ""
+
+  For Each tblADOX In cat.Tables
+    If Left(tblADOX.Name, 4) <> "MSys" Then
+      If tblADOX.Indexes.Count <> 0 Then
+        For Each idxADOX In tblADOX.Indexes
+
+          With idxADOX
+            If .PrimaryKey Then
+              For Each colADOX In .Columns
+                msg = tblADOX.Name & ": " & colADOX.Name
+                Debug.Print msg
+                Next
+            End If
+          End With
+
+          Next
+
+        End If
+      End If
+    Next
+
+  Set cat = Nothing
+  Set tblADOX = Nothing
+  Set idxADOX = Nothing
+  Set colADOX = Nothing
+
+  Exit Function
+
+errHandler:    MsgBox Err.Number & ": " & Err.Description, vbOKOnly, "Error"
+  Set cat = Nothing
+  Set tblADOX = Nothing
+  Set idxADOX = Nothing
+  Set colADOX = Nothing
+
+End Function
+
+' ---------------------------------------------------------------------------------
+Function ListAllKeys() As String
+  ' List all keys. For foreign keys list the related tables.
+  ' Does not necessarily identify sequence of compound keys
+  '
+  'Must reference ADOX library:
+  'Microsoft ADO Ext. 2.8 for DDL and Security.
+
+  Dim cat As New ADOX.Catalog
+  Dim tblADOX As New ADOX.Table
+  Dim idxADOX As New ADOX.Index
+  Dim colADOX As New ADOX.column
+  Dim msg As String
+  'Dim tbl As ADOX.Table
+  Dim ky As New ADOX.key
+  
+  cat.ActiveConnection = CurrentProject.AccessConnection
+  'ListPK = ""
+  On Error GoTo errHandler
+
+  For Each tblADOX In cat.Tables
+
+    If Left(tblADOX.Name, 4) <> "MSys" Then
+
+        For Each ky In tblADOX.Keys
+          If Len(ky.RelatedTable) > 0 Then
+            For Each colADOX In ky.Columns
+              msg = tblADOX.Name & " FK: " & ky.RelatedTable & " (" & colADOX.Name & ")"
+              Debug.Print msg
+              Next
+            
+          Else
+            For Each colADOX In ky.Columns
+              msg = tblADOX.Name & " PK: " & colADOX.Name
+              Debug.Print msg
+              Next
+          End If
+          
+          Next
+
+    End If
+    
+    Next
+
+  Set cat = Nothing
+  Set tblADOX = Nothing
+  Set idxADOX = Nothing
+  Set colADOX = Nothing
+
+  Exit Function
+
+errHandler:    MsgBox Err.Number & ": " & Err.Description, vbOKOnly, "Error"
+  Set cat = Nothing
+  Set tblADOX = Nothing
+  Set idxADOX = Nothing
+  Set colADOX = Nothing
+
+End Function
+

@@ -1,0 +1,16 @@
+
+RTree Indexes for MUPOLYGON
+
+rtree_mupolygon_shape:
+CREATE VIRTUAL TABLE "rtree_mupolygon_shape" USING rtree(id, minx, maxx, miny, maxy)
+
+rtree_mupolygon_shape_node:
+CREATE TABLE "rtree_mupolygon_shape_node"(nodeno INTEGER PRIMARY KEY,data)
+
+rtree_mupolygon_shape_parent:
+CREATE TABLE "rtree_mupolygon_shape_parent"(nodeno INTEGER PRIMARY KEY,parentnode)
+
+rtree_mupolygon_shape_rowid:
+CREATE TABLE "rtree_mupolygon_shape_rowid"(rowid INTEGER PRIMARY KEY,nodeno)
+
+plus 6 triggers for delete, insert and 4 types of updates

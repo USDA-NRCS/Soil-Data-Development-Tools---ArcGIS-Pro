@@ -1,0 +1,32 @@
+
+SELECT algorithmname,
+        CASE
+          WHEN SDV.algorithmname = 'Percent Present'
+            THEN 'Percent Present'
+
+          WHEN SDV.attributetype = 'Interpretation' AND MD.choice in ('limitation', 'suitability')
+            THEN 'Dominant Condition,Dominant Component,Least Limiting,Most Limiting,Weighted Average' 
+
+          WHEN SDV.mapunitlevelattribflag = 1
+            THEN 'No Aggregation Necessary'
+
+          WHEN SDV.attributelogicaldatatype IN ('Integer', 'Float')
+            THEN 'Dominant Condition,Dominant Component,Minimum or Maximum,Weighted Average'
+
+          WHEN SDV.tiebreakdomainname IS NOT NULL
+            THEN 'Dominant Condition,Dominant Component,Minimum or Maximum'
+
+          ELSE 'Dominant Condition,Dominant Component'
+
+        END AggMethods
+        FROM sdvattribute AS SDV
+        LEFT OUTER JOIN mdstatdomdet AS MD ON SDV.ruledesign = MD.choicesequence AND MD.domainname = 'rule_design'
+        WHERE attributename = ? ;
+
+Surface Irrigation Intake Family (TX)
+National Commodity Crop Productivity Index
+Rangeland Planting by Mechanical Seeding (TX)
+Mechanical Site Preparation (Deep)
+Hydric Rating by Map Unit
+Drainage Class
+Dwellings With Basements

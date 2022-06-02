@@ -1,0 +1,40 @@
+
+-- Note. Attempts to drop the 'rtree_mupolygon_shape' returned an error: 'Could not delete the table. 
+-- from database engine,  no such module RTREE.
+-- This error appears to be caused by the available version of sqlite.dll.
+-- Downloads for sqlite: https://www.sqlite.org/download.html
+--
+RTree Tables with cascading deletes
+-------------------------------------------------------------------
+
+CREATE VIRTUAL TABLE "rtree_mupolygon_shape" USING RTREE (id,minx,maxx,miny,maxy)
+
+CREATE TABLE "rtree_mupolygon_shape_node"(nodeno INTEGER PRIMARY KEY,data)
+
+CREATE TABLE "rtree_mupolygon_shape_parent"(nodeno INTEGER PRIMARY KEY,parentnode)
+
+CREATE TABLE "rtree_mupolygon_shape_rowid"(rowid INTEGER PRIMARY KEY,nodeno)
+
+
+
+RTree Triggers for Mupolygon
+-------------------------------------------------------------------
+
+rtree_mupolygon_shape_delete
+CREATE TRIGGER "rtree_mupolygon_shape_delete" AFTER DELETE ON "mupolygon" WHEN old."shape" NOT NULL BEGIN DELETE FROM "rtree_mupolygon_shape" WHERE id = OLD."objectid"; END
+
+rtree_mupolygon_shape_insert
+CREATE TRIGGER "rtree_mupolygon_shape_insert" AFTER INSERT ON "mupolygon" WHEN (new."shape" NOT NULL AND NOT ST_IsEmpty(NEW."shape")) BEGIN INSERT OR REPLACE INTO "rtree_mupolygon_shape" VALUES (NEW."objectid", ST_MinX(NEW."shape"), ST_MaxX(NEW."shape"), ST_MinY(NEW."shape"), ST_MaxY(NEW."shape"));END
+
+rtree_mupolygon_shape_update1
+CREATE TRIGGER "rtree_mupolygon_shape_update1" AFTER UPDATE OF "shape" ON "mupolygon" WHEN OLD."objectid" = NEW."objectid" AND (NEW."shape" NOTNULL AND NOT ST_IsEmpty(NEW."shape")) BEGIN INSERT OR REPLACE INTO "rtree_mupolygon_shape" VALUES ( NEW."objectid", ST_MinX(NEW."shape"), ST_MaxX(NEW."shape"), ST_MinY(NEW."shape"), ST_MaxY(NEW."shape")); END
+
+rtree_mupolygon_shape_update2
+CREATE TRIGGER "rtree_mupolygon_shape_update2" AFTER UPDATE OF "shape" ON "mupolygon" WHEN OLD."objectid" = NEW."objectid" AND (NEW."shape" ISNULL OR ST_IsEmpty(NEW."shape")) BEGIN DELETE FROM "rtree_mupolygon_shape" WHERE id = OLD."objectid"; END
+
+rtree_mupolygon_shape_update3
+CREATE TRIGGER "rtree_mupolygon_shape_update3" AFTER UPDATE ON "mupolygon" WHEN OLD."objectid" != NEW."objectid" AND (NEW."shape" NOTNULL AND NOT ST_IsEmpty(NEW."shape")) BEGIN DELETE FROM "rtree_mupolygon_shape" WHERE id = OLD."objectid"; INSERT OR REPLACE INTO "rtree_mupolygon_shape" VALUES ( NEW."objectid", ST_MinX(NEW."shape"), ST_MaxX(NEW."shape"), ST_MinY(NEW."shape"), ST_MaxY(NEW."shape")); END
+
+rtree_mupolygon_shape_update4
+CREATE TRIGGER "rtree_mupolygon_shape_update4" AFTER UPDATE ON "mupolygon" WHEN OLD."objectid" != NEW."objectid" AND (NEW."shape" ISNULL OR ST_IsEmpty(NEW."shape")) BEGIN DELETE FROM "rtree_mupolygon_shape" WHERE id IN (OLD."objectid", NEW."objectid"); END
+

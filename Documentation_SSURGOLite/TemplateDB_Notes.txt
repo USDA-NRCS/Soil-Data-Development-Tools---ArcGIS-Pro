@@ -1,0 +1,58 @@
+
+
+SPATIALITE with ST_GEOMETRY will have several tables named st_*. Some of these appear to be spatial indexes.
+
+ - test_spatialite_stgeom_atts.sqlite has SSURGO attribute tables
+ - test_spatialite_stgeom_noatts.sqlite is geometry tables only
+
+I used featureclass to featureclass from shapefile to create populate this test database.
+Question. Does this still work when using empty shapefiles? Does this work when I use Append tool?
+
+-------------------------------------------------------------------
+1. st_aux_spatial_reference_systems
+srid, auth_name, auth_srid, srtext, falsex, falsey, xyunits, falsez, zunits, falsem, munits, xycluster_tol, zcluster_tol, mcluster_tol, object_flags
+300001
+EPSG
+4326
+GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]
+-400.0
+-400.0
+1111948722.22222
+-100000.0
+100000.0
+-100000.0
+100000.0
+8.98315284119522e-09
+0.001
+0.001
+1
+
+2. st_geometry_columns
+f_table_name, f_geometry_column, geometry_type, coord_dimension, srid, spatial_index_type
+featpoint, Shape, 1, 2, 300001, RTREEXY
+featline, Shape, 5, 2, 300001, RTREEXY
+sapolygon, Shape, 6, 2, 300001, RTREEXY
+
+3. st_spatial_reference_systems
+Nothing appears 
+
+
+4. sqlite_sequence (contains max id for each table?)
+name, seq
+mupolygon, 6378
+featpoint, 56
+
+
+-------------------------------------------------------------------
+PROBLEMS SEEN IN MY Template_Spatial_STGeom_IntKey.sqlite database...
+
+1. No spatial indexes yet in this template database. Is that OK? There should be an entry in [st_geometry_columns] for the spatial_index_type.
+
+2. st_aux_spatial_reference_systems table only has a single record. ESRI auth with UNKNOWN [srtext]
+
+3. sqlite_sequence table only has 2 records for st_aux_spatial_reference_systems and st_geometry_columns. Should it have all tables with zero for seq? My method of importing SSURGO data does not add those record counts and it does not add a record for the attribute tables.
+
+4. I question some of the values I used from the st_aux_spatial_reference_systems 4326 record. Need to find a good example and compare.
+
+5. What happens if I use Pro to build spatial indexes for this spatialite st_geometry database? Do the RTrees get built and the st_geometry_columns table updated?
+

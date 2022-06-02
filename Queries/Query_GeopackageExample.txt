@@ -1,0 +1,45 @@
+https://gis.stackexchange.com/questions/312652/create-geometry-column-in-geopackage-with-sql
+
+
+-- gpkg_contents Table Definition SQL
+CREATE TABLE gpkg_contents (
+  table_name TEXT NOT NULL PRIMARY KEY,
+  data_type TEXT NOT NULL,
+  identifier TEXT UNIQUE,
+  description TEXT DEFAULT '',
+  last_change DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now')),
+  min_x DOUBLE,
+  min_y DOUBLE,
+  max_x DOUBLE,
+  max_y DOUBLE,
+  srs_id INTEGER,
+  CONSTRAINT fk_gc_r_srs_id FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys(srs_id)
+);
+
+
+-- gpkg_geometry_columns Table Definition SQL
+CREATE TABLE gpkg_geometry_columns (
+  table_name TEXT NOT NULL,
+  column_name TEXT NOT NULL,
+  geometry_type_name TEXT NOT NULL,
+  srs_id INTEGER NOT NULL,
+  z TINYINT NOT NULL,
+  m TINYINT NOT NULL,
+  CONSTRAINT pk_geom_cols PRIMARY KEY (table_name, column_name),
+  CONSTRAINT uk_gc_table_name UNIQUE (table_name),
+  CONSTRAINT fk_gc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name),
+  CONSTRAINT fk_gc_srs FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys (srs_id)
+);
+
+--
+CREATE TABLE 'sample_attribute_with_geometry' (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  geometry MULTIPOLYGON NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  date INTEGER NOT NULL,
+  source TEXT NOT NULL);
+
+insert into gpkg_contents values ('sample_attribute_with_geometry', 'features','some description','sample_attribute_with_geometry','2019-02-19T10:49:06.022Z',74572.400000,6631280.000000,732294.000000,7774890.000000,31370);
+
+insert into gpkg_geometry_columns values ('sample_attribute_with_geometry','geometry','MULTIPOLYGON',31370, 0, 0 )

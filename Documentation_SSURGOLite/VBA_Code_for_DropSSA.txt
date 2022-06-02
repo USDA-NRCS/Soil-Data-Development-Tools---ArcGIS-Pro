@@ -1,0 +1,240 @@
+Option Compare Database
+Option Explicit
+
+Private Sub cmdCancel_Click()
+DoCmd.Close acForm, "Drop Soil Survey Area"
+End Sub
+
+Private Sub cmdDrop_Click()
+Dim dbsSSURGO As Database
+Dim tv As Recordset
+Dim qdfTemp As QueryDef
+Dim varItm As Variant
+Dim strResponse As String
+Dim strNewline As String
+Dim strMessage As String
+    
+strNewline = String(1, 13) & String(1, 10)
+
+If Me!lstSoilSurveyArea.ItemsSelected.Count = 0 Then
+    MsgBox "You have not selected any soil survey areas to be dropped.", vbOKOnly + vbExclamation, "Drop Soil Survey Area - Error"
+Else
+    strMessage = "Continuing will result in the removal of all selected soil survey areas from your database." _
+    & strNewline & strNewline & "Do you wish to continue?"
+    strResponse = MsgBox(strMessage, vbYesNo + vbExclamation, "Drop Soil Survey Area - Warning")
+    If strResponse = vbYes Then
+        Set dbsSSURGO = DBEngine.Workspaces(0).Databases(0)
+        Set qdfTemp = dbsSSURGO.CreateQueryDef("", "Delete from [SYSTEM - Soil Survey Area]")
+        qdfTemp.Execute
+        Set tv = dbsSSURGO.OpenRecordset("SYSTEM - Soil Survey Area", DB_OPEN_TABLE)
+        For Each varItm In Me!lstSoilSurveyArea.ItemsSelected
+            tv.AddNew
+            tv![area symbol] = Me!lstSoilSurveyArea.column(0, varItm)
+            tv![area name] = Me!lstSoilSurveyArea.column(1, varItm)
+            tv![legend key] = Me!lstSoilSurveyArea.column(2, varItm)
+            tv.Update
+        Next varItm
+        tv.Close
+        DoCmd.Close acForm, "Drop Soil Survey Area"
+        Call DropSSA
+    End If
+End If
+End Sub
+
+Private Sub Form_Error(DataErr As Integer, Response As Integer)
+'The initial problem was that I was getting an error message due
+'to controls on this form, that I wished to supress, since I am
+'checking if the legend table exists.  In order to supress Access'
+'message until I could display my error message and close the form,
+'I had to use this solution, which I found on page 497 of the Access
+'97 Developers Handbook
+Response = acDataErrContinue
+End Sub
+
+Private Sub Form_Load()
+Dim strMsg As String
+Dim newline As String
+
+newline = String(1, 13) & String(1, 10)
+
+Forms![drop soil survey area].Caption = "Drop Soil Survey Area    (Template Version: " & GetTemplateVersion() & ")"
+
+'Does a table named "legend" currently exist?
+If Not LegendTableExists() Then
+    DoCmd.Close acForm, "Drop Soil Survey Area"
+    strMsg = "One or more required tables are missing." & newline & newline
+    strMsg = strMsg & "Therefore this action is not permitted at this time."
+    MsgBox strMsg, vbOKOnly + vbExclamation, "Drop Soil Survey Area - Error"
+    Exit Sub
+End If
+
+'A table named "legend" exists.  Is it a linked table?
+If LegendTableAttached() Then
+    DoCmd.Close acForm, "Drop Soil Survey Area"
+    strMsg = "The soil data tables currently reside in an attached database." & newline & newline
+    strMsg = strMsg & "You are not permitted to drop soil survey areas from an attached database."
+    MsgBox strMsg, vbOKOnly + vbExclamation, "Drop Soil Survey Area - Error"
+    Exit Sub
+End If
+
+'Table "legend" is not a linked table.  Is it empty?
+If LegendTableEmpty() Then
+    DoCmd.Close acForm, "Drop Soil Survey Area"
+    strMsg = "The database contains no soil survey areas at this time."
+    MsgBox strMsg, vbOKOnly + vbExclamation, "Drop Soil Survey Area - No Data"
+    Exit Sub
+End If
+
+End Sub
+
+
+
+
+Function DropSSA()
+'
+'This function deletes the data corresponding to one or more soil survey
+'areas that were selected by the user via the "Drop Soil Survey Area"
+'form.  This function has no input arguments and does not return any
+'value to indicate success or failure.
+'
+'The keys of the soil survey areas selected by the user to be deleted
+'are written to a file by the name of "SYSTEM - Soil Survey Area", by
+'an event procedure of the "Drop Soil Survey Area" form.  This function
+'then reads that file to get the keys of the soil survey area or areas
+'to be deleted.
+'
+Dim dbs As Database, rst1 As Recordset, rst2 As Recordset
+Dim qdfTemp As QueryDef
+Dim strSQL1 As String, strSQL2 As String, strSQL3 As String
+Dim strMessage As String
+Dim lngDistmdkey As Long
+Dim lngLegendCount As Long
+Dim strNewline As String
+Dim rcode As Variant
+    
+strNewline = String(1, 13) & String(1, 10)
+    
+Set dbs = CurrentDb
+'Open a cursor for the legends to be deleted.
+strSQL1 = "Select [area symbol], [area name], [legend key] from [SYSTEM - Soil Survey Area]"
+Set rst1 = dbs.OpenRecordset(strSQL1)
+Do Until rst1.EOF
+    'For each legend to be deleted, do the following.
+    rcode = SysCmd(GenericSetStatus, "Dropping data for survey area: " & rst1![area symbol] & " - " & rst1![area name] & "...")
+    
+    'Determine the primary key of the distribution metadata record associated with this legend.
+    strSQL2 = "Select [distmdkey] from [distlegendmd] where lkey = '" & rst1![legend key] & "'"
+    Set rst2 = dbs.OpenRecordset(strSQL2)
+    If rst2.RecordCount = 0 Then
+        rst2.Close
+        strMessage = "Unable to determine the primary key of the distribution metadata record associated with soil survey area: " _
+        & strNewline & rst1![area symbol] & " - " & rst1![area name] & strNewline & strNewline & "One or more soil survey areas could not be dropped."
+        MsgBox strMessage, vbOKOnly + vbExclamation, "Drop Soil Survey Area - Error"
+        Exit Function
+    Else
+        lngDistmdkey = rst2![distmdkey]
+        rst2.Close
+    End If
+    
+    'Determine if there is currently more than legend associated with this distribution metadata record.
+    strSQL2 = "Select count(*) as LegendCount from distlegendmd where [distmdkey] = '" & lngDistmdkey & "'"
+    Set rst2 = dbs.OpenRecordset(strSQL2)
+    lngLegendCount = rst2![LegendCount]
+    rst2.Close
+    
+    If lngLegendCount = 1 Then
+        'This legend is the only remaining legend for the corresponding distribution metadata record.
+        'Delete the corresponding distribution metadata record and all of its children.  It is sufficient
+        'to delete the parent distribution metadata record because all relationships within the distribution
+        'metadata object are set to "delete/cascade".
+        Set qdfTemp = dbs.CreateQueryDef("", "Delete from [distmd] where distmdkey = '" & lngDistmdkey & "'")
+        qdfTemp.Execute
+    Else
+        'This legend is not the only remaining legend for the corresponding distribution metadata record.
+        'Just delete this legend from the legend distribution metadata table.
+        Set qdfTemp = dbs.CreateQueryDef("", "Delete from [distlegendmd] where lkey = '" & rst1![legend key] & "'")
+        qdfTemp.Execute
+    End If
+    '
+    'Delete this legend and all of its children.  We use to just delete the legend record and let cascade delete
+    'rules take care of child tables, but we have since discovered that this approach exhausts all system resources
+    'for large soil survey areas.  Accordingly, we now delete data for a survey in 4 steps. 
+    ' 
+    ' Step 1 - Delete everything
+    'at the chorizon level and below, for the appropriate survey area.  
+    ' Step 2 - Delete everything in cointerp, for the
+    'appropriate survey area.  
+    ' Step 3 - Delete everything at the component level and below, for the appropriate survey
+    'area.  
+    ' Step 4 - Delete everything at the legend level and below, for the appropriate survey area.
+    'This is arguably a little Mickey Mouse, but I didn't want to delete from each table individually.  This approach
+    'does succeed on my PC, for the largest soil survey area, MT627, with a full set of interps, where loaded database
+    'size is approximately 388MB.
+    '
+    'Step 1 - Delete from chorizon and below.
+    strSQL3 = "DELETE chorizon.*, legend.lkey "
+    strSQL3 = strSQL3 & "FROM legend INNER JOIN (mapunit INNER JOIN (component INNER JOIN chorizon ON component.cokey = chorizon.cokey) ON mapunit.mukey = component.mukey) ON legend.lkey = mapunit.lkey "
+    strSQL3 = strSQL3 & "WHERE (((legend.lkey)='" & rst1![legend key] & "'));"
+    Set qdfTemp = dbs.CreateQueryDef("", strSQL3)
+    qdfTemp.Execute
+
+    'Step 2 - Delete from cointerp.
+    strSQL3 = "DELETE cointerp.*, legend.lkey "
+    strSQL3 = strSQL3 & "FROM legend INNER JOIN (mapunit INNER JOIN (component INNER JOIN cointerp ON component.cokey = cointerp.cokey) ON mapunit.mukey = component.mukey) ON legend.lkey = mapunit.lkey "
+    strSQL3 = strSQL3 & "WHERE (((legend.lkey)='" & rst1![legend key] & "'));"
+    Set qdfTemp = dbs.CreateQueryDef("", strSQL3)
+    qdfTemp.Execute
+
+    'Step 3 - Delete from component and below.
+    strSQL3 = "DELETE component.*, legend.lkey "
+    strSQL3 = strSQL3 & "FROM legend INNER JOIN (mapunit INNER JOIN component ON mapunit.mukey = component.mukey) ON legend.lkey = mapunit.lkey "
+    strSQL3 = strSQL3 & "WHERE (((legend.lkey)='" & rst1![legend key] & "'));"
+    Set qdfTemp = dbs.CreateQueryDef("", strSQL3)
+    qdfTemp.Execute
+
+    'Step 4 - Delete from legend and below.
+    strSQL3 = "DELETE legend.*, legend.lkey "
+    strSQL3 = strSQL3 & "FROM legend "
+    strSQL3 = strSQL3 & "WHERE (((legend.lkey)='" & rst1![legend key] & "'));"
+    Set qdfTemp = dbs.CreateQueryDef("", strSQL3)
+    qdfTemp.Execute
+
+    'The following step was added for SSURGO version 2.1, which includes additional tables.
+    'Step 5 - Delete from sacatalog and below.
+    'At the current time, the sacatalog hierarchy is independent of the legend hierarchy.
+    strSQL3 = "DELETE sacatalog.*, sacatalog.areasymbol "
+    strSQL3 = strSQL3 & "FROM sacatalog "
+    strSQL3 = strSQL3 & "WHERE (((sacatalog.areasymbol)='" & rst1![area symbol] & "'));"
+    Set qdfTemp = dbs.CreateQueryDef("", strSQL3)
+    qdfTemp.Execute
+
+    'The following step was added for SSURGO version 2.1, which includes additional tables.
+    'Step 6 - Delete from featdesc.
+    'The featdesc table is not related to any other table in the database, at least via
+    'engine level referential integrity.
+    strSQL3 = "DELETE featdesc.*, featdesc.areasymbol "
+    strSQL3 = strSQL3 & "FROM featdesc "
+    strSQL3 = strSQL3 & "WHERE (((featdesc.areasymbol)='" & rst1![area symbol] & "'));"
+    Set qdfTemp = dbs.CreateQueryDef("", strSQL3)
+    qdfTemp.Execute
+    
+    rcode = SysCmd(GenericClearStatus)
+    rst1.MoveNext
+Loop
+
+'Reset map unit sort table to remove references to mapunits that have been deleted.
+Set qdfTemp = dbs.CreateQueryDef("", "Delete from [SYSTEM - Mapunit Sort Specifications]")
+qdfTemp.Execute
+
+'Reset interp depth sort table to remove references to components that have been deleted.
+Set qdfTemp = dbs.CreateQueryDef("", "Delete from [SYSTEM - Interp Depth Sequence]")
+qdfTemp.Execute
+
+'Reestablish map unit sort data for all remaining mapunits.
+Call SortAllMapunits
+
+'Reestablish interp depth sort data for all remaining components.
+Call SortInterpsByDepth
+
+End Function
+

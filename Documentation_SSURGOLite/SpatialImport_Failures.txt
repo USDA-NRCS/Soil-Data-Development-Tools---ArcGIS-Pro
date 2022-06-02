@@ -1,0 +1,45 @@
+Successful run using a single input SSA and the "template_spatialitegui_06_esriindex.sqlite" template database.
+Failed though, when I added a second SSA to the iteration.
+Next test will be to feed the tradional list of shapefiles to the Append command. Nope, this failed as well.
+===========================================================================================================
+
+Start Time: Thursday, June 24, 2021 2:28:56 PM
+.	Extensions folder: D:\Geodata\2021\SQLite_Tests\ApplicationData\Extensions
+.	Creating list of shapefiles to be imported for each survey area...
+Creating new database: D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite15.sqlite
+.	Creating new database connection...
+.	Turning ON foreign key constraints...
+.	Increasing database cache size...
+.
+Setting cache size for indexing performance...
+.	Dropping attribute indexes from new database...
+.
+.	Importing tabular data using function 'ImportTabularSQL2'...
+.	Excluding 6 deprecated cointerp columns
+.	Finally closing database
+All tabular data imported
+.
+.	Importing spatial data using AppendFeatures_ArcPy function...
+.	Appending 1 soil mapunit polygon shapefiles to create new featureclass: MUPOLYGON
+.		Appending shapefile D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157.shp...
+.	Append complete for mupoly
+.	Appending 1 special feature point shapefiles to create new featureclass: FEATPOINT
+.	Appending 1 survey boundary shapefiles to create new featureclass: SAPOLYGON
+.
+.	Skipping sapolygon feature count
+Successfully imported all spatial data to new database
+.	Registering spatial layers to the database
+.
+All tabular and spatial data have been imported...
+.
+Restoring previously existing attribute indexes for the new database...
+.
+Compacting new database...
+.	Database size before:	49 MB
+.	Free temp space: 153,089 MB
+.	Minimum free disk space required: 98 MB
+.	Database size after:	47 MB
+.	Finished compacting database...
+.
+Output database:  D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite15.sqlite
+Succeeded at Thursday, June 24, 2021 2:30:09 PM (Elapsed Time: 1 minutes 12 seconds)

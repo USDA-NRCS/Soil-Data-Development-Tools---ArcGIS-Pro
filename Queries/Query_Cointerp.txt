@@ -1,0 +1,22 @@
+SELECT L.areasymbol, musym, M.muname, M.mukey, C.cokey, compname, comppct_r, interpname, interphr, interphrc
+FROM legend AS L
+LEFT OUTER JOIN sainterp AS SI ON L.lkey = SI.sacatalogkey AND SI.interpname = 'ENG - Dwellings W/O Basements'
+INNER JOIN mapunit AS M ON L.lkey = M.lkey
+LEFT OUTER JOIN component AS C ON M.mukey = C.mukey
+LEFT OUTER JOIN cointerp AS P ON C.cokey = P.cokey 
+WHERE L.areasymbol = 'KS001' 
+ORDER BY L.areasymbol, musym, comppct_r DESC;
+
+
+
+distinterpmd.rulename = 'ENG - Dwellings W/O Basements' AND distinterpmdkey = 6270959
+
+sainterp.sainterpkey = 6271703 
+
+mrulekey = 340
+
+disinterpmd.rulekey = 340   disinterpmd.distmdkey = 72794   distinterpmdkey = 6270959
+
+legend.lkey = 10532
+
+sainterp.sacatalogkey = 10532

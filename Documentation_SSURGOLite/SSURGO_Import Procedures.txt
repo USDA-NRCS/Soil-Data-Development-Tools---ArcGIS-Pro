@@ -1,0 +1,832 @@
+Attribute VB_Name = "Import Procedures"
+Option Compare Database
+Option Explicit
+
+Const GenericSetStatus = acSysCmdSetStatus
+Const GenericClearStatus = acSysCmdClearStatus
+Const ExpectedSSURGOVersion = 2
+Const ExpectedImportDataModelVersion = 3
+Const BaseMetadataVersion = 1
+Sub Import_Processed_Unload(import_dir_path As Variant, ImportMetadata As Boolean, return_code As Integer)
+
+'Import unloaded ASCII pipe delimited data into a set of empty tables.
+
+Dim dbsDatabaseImport As Database
+Dim rcode As Variant
+Dim msgboxresponse As Integer
+Dim position As Variant
+Dim areasymbol As String
+
+On Error GoTo import_processed_unloadErr
+Set dbsDatabaseImport = DBEngine.Workspaces(0).Databases(0)
+
+'The following files are "present"* only in post-sdm exports.
+If FileExists(import_dir_path & "sacatlog.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into sacatalog...")
+    DoCmd.TransferText acImportDelim, "sacatlog Import Specification", "sacatalog", import_dir_path & "sacatlog.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "sacatlog.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "sainterp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into sainterp...")
+    DoCmd.TransferText acImportDelim, "sainterp Import Specification", "sainterp", import_dir_path & "sainterp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "sainterp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+
+If FileExists(import_dir_path & "distmd.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into distmd...")
+    DoCmd.TransferText acImportDelim, "distmd Import Specification", "distmd", import_dir_path & "distmd.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "distmd.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "legend.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into legend...")
+    DoCmd.TransferText acImportDelim, "legend Import Specification", "legend", import_dir_path & "legend.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "legend.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "distimd.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into distinterpmd...")
+    DoCmd.TransferText acImportDelim, "distimd Import Specification", "distinterpmd", import_dir_path & "distimd.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "distimd.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "distlmd.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into distlegendmd...")
+    DoCmd.TransferText acImportDelim, "distlmd Import Specification", "distlegendmd", import_dir_path & "distlmd.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "distlmd.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "lareao.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into laoverlap...")
+    DoCmd.TransferText acImportDelim, "lareao Import Specification", "laoverlap", import_dir_path & "lareao.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "lareao.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ltext.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into legendtext...")
+    DoCmd.TransferText acImportDelim, "ltext Import Specification", "legendtext", import_dir_path & "ltext.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ltext.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "mapunit.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mapunit...")
+    DoCmd.TransferText acImportDelim, "mapunit Import Specification", "mapunit", import_dir_path & "mapunit.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "mapunit.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "comp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into component...")
+    DoCmd.TransferText acImportDelim, "comp Import Specification", "component", import_dir_path & "comp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "comp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "muaggatt.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into muaggatt...")
+    DoCmd.TransferText acImportDelim, "muaggatt Import Specification", "muaggatt", import_dir_path & "muaggatt.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "muaggatt.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "muareao.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into muaoverlap...")
+    DoCmd.TransferText acImportDelim, "muareao Import Specification", "muaoverlap", import_dir_path & "muareao.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "muareao.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "mucrpyd.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mucropyld...")
+    DoCmd.TransferText acImportDelim, "mucrpyd Import Specification", "mucropyld", import_dir_path & "mucrpyd.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "mucrpyd.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "mutext.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mutext...")
+    DoCmd.TransferText acImportDelim, "mutext Import Specification", "mutext", import_dir_path & "mutext.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "mutext.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chorizon.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chorizon...")
+    DoCmd.TransferText acImportDelim, "chorizon Import Specification", "chorizon", import_dir_path & "chorizon.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chorizon.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ccancov.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cocanopycover...")
+    DoCmd.TransferText acImportDelim, "ccancov Import Specification", "cocanopycover", import_dir_path & "ccancov.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ccancov.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ccrpyd.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cocropyld...")
+    DoCmd.TransferText acImportDelim, "ccrpyd Import Specification", "cocropyld", import_dir_path & "ccrpyd.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ccrpyd.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cdfeat.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into codiagfeatures...")
+    DoCmd.TransferText acImportDelim, "cdfeat Import Specification", "codiagfeatures", import_dir_path & "cdfeat.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cdfeat.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cecoclas.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into coecoclass...")
+    DoCmd.TransferText acImportDelim, "cecoclas Import Specification", "coecoclass", import_dir_path & "cecoclas.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cecoclas.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cerosnac.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into coerosionacc...")
+    DoCmd.TransferText acImportDelim, "cerosnac Import Specification", "coerosionacc", import_dir_path & "cerosnac.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cerosnac.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ceplants.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into coeplants...")
+    DoCmd.TransferText acImportDelim, "ceplants Import Specification", "coeplants", import_dir_path & "ceplants.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ceplants.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cfprod.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into coforprod...")
+    DoCmd.TransferText acImportDelim, "cfprod Import Specification", "coforprod", import_dir_path & "cfprod.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cfprod.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cgeomord.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cogeomordesc...")
+    DoCmd.TransferText acImportDelim, "cgeomord Import Specification", "cogeomordesc", import_dir_path & "cgeomord.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cgeomord.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chydcrit.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cohydriccriteria...")
+    DoCmd.TransferText acImportDelim, "chydcrit Import Specification", "cohydriccriteria", import_dir_path & "chydcrit.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chydcrit.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cinterp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cointerp...")
+    DoCmd.TransferText acImportDelim, "cinterp Import Specification", "cointerp", import_dir_path & "cinterp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cinterp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cmonth.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into comonth...")
+    DoCmd.TransferText acImportDelim, "cmonth Import Specification", "comonth", import_dir_path & "cmonth.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cmonth.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cpmatgrp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into copmgrp...")
+    DoCmd.TransferText acImportDelim, "cpmatgrp Import Specification", "copmgrp", import_dir_path & "cpmatgrp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cpmatgrp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cpwndbrk.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into copwindbreak...")
+    DoCmd.TransferText acImportDelim, "cpwndbrk Import Specification", "copwindbreak", import_dir_path & "cpwndbrk.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cpwndbrk.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "crstrcts.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into corestrictions...")
+    DoCmd.TransferText acImportDelim, "crstrcts Import Specification", "corestrictions", import_dir_path & "crstrcts.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "crstrcts.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "csfrags.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosurffrags...")
+    DoCmd.TransferText acImportDelim, "csfrags Import Specification", "cosurffrags", import_dir_path & "csfrags.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "csfrags.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ctxfmmin.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cotaxfmmin...")
+    DoCmd.TransferText acImportDelim, "ctxfmmin Import Specification", "cotaxfmmin", import_dir_path & "ctxfmmin.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ctxfmmin.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ctxfmoth.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cotxfmother...")
+    DoCmd.TransferText acImportDelim, "ctxfmoth Import Specification", "cotxfmother", import_dir_path & "ctxfmoth.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ctxfmoth.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ctxmoicl.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cotaxmoistcl...")
+    DoCmd.TransferText acImportDelim, "ctxmoicl Import Specification", "cotaxmoistcl", import_dir_path & "ctxmoicl.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ctxmoicl.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ctext.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cotext...")
+    DoCmd.TransferText acImportDelim, "ctext Import Specification", "cotext", import_dir_path & "ctext.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ctext.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "ctreestm.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cotreestomng...")
+    DoCmd.TransferText acImportDelim, "ctreestm Import Specification", "cotreestomng", import_dir_path & "ctreestm.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "ctreestm.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chaashto.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chaashto...")
+    DoCmd.TransferText acImportDelim, "chaashto Import Specification", "chaashto", import_dir_path & "chaashto.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chaashto.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chconsis.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chconsistence...")
+    DoCmd.TransferText acImportDelim, "chconsis Import Specification", "chconsistence", import_dir_path & "chconsis.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chconsis.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chdsuffx.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chdesgnsuffix...")
+    DoCmd.TransferText acImportDelim, "chdsuffx Import Specification", "chdesgnsuffix", import_dir_path & "chdsuffx.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chdsuffx.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chfrags.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chfrags...")
+    DoCmd.TransferText acImportDelim, "chfrags Import Specification", "chfrags", import_dir_path & "chfrags.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chfrags.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chpores.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chpores...")
+    DoCmd.TransferText acImportDelim, "chpores Import Specification", "chpores", import_dir_path & "chpores.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chpores.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chstrgrp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chstructgrp...")
+    DoCmd.TransferText acImportDelim, "chstrgrp Import Specification", "chstructgrp", import_dir_path & "chstrgrp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chstrgrp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chtext.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chtext...")
+    DoCmd.TransferText acImportDelim, "chtext Import Specification", "chtext", import_dir_path & "chtext.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chtext.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chtexgrp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chtexturegrp...")
+    DoCmd.TransferText acImportDelim, "chtexgrp Import Specification", "chtexturegrp", import_dir_path & "chtexgrp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chtexgrp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chunifie.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chunified...")
+    DoCmd.TransferText acImportDelim, "chunifie Import Specification", "chunified", import_dir_path & "chunifie.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chunifie.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cfprodo.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into coforprodo...")
+    DoCmd.TransferText acImportDelim, "cfprodo Import Specification", "coforprodo", import_dir_path & "cfprodo.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cfprodo.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cpmat.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into copm...")
+    DoCmd.TransferText acImportDelim, "cpmat Import Specification", "copm", import_dir_path & "cpmat.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cpmat.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "csmoist.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosoilmoist...")
+    DoCmd.TransferText acImportDelim, "csmoist Import Specification", "cosoilmoist", import_dir_path & "csmoist.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "csmoist.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "cstemp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosoiltemp...")
+    DoCmd.TransferText acImportDelim, "cstemp Import Specification", "cosoiltemp", import_dir_path & "cstemp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "cstemp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "csmorgc.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosurfmorphgc...")
+    DoCmd.TransferText acImportDelim, "csmorgc Import Specification", "cosurfmorphgc", import_dir_path & "csmorgc.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "csmorgc.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "csmorhpp.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosurfmorphhpp...")
+    DoCmd.TransferText acImportDelim, "csmorhpp Import Specification", "cosurfmorphhpp", import_dir_path & "csmorhpp.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "csmorhpp.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "csmormr.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosurfmorphmr...")
+    DoCmd.TransferText acImportDelim, "csmormr Import Specification", "cosurfmorphmr", import_dir_path & "csmormr.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "csmormr.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "csmorss.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into cosurfmorphss...")
+    DoCmd.TransferText acImportDelim, "csmorss Import Specification", "cosurfmorphss", import_dir_path & "csmorss.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "csmorss.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chstr.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chstruct...")
+    DoCmd.TransferText acImportDelim, "chstr Import Specification", "chstruct", import_dir_path & "chstr.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chstr.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chtextur.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chtexture...")
+    DoCmd.TransferText acImportDelim, "chtextur Import Specification", "chtexture", import_dir_path & "chtextur.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chtextur.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "chtexmod.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into chtexturemod...")
+    DoCmd.TransferText acImportDelim, "chtexmod Import Specification", "chtexturemod", import_dir_path & "chtexmod.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "chtexmod.txt was not found.", vbCritical + vbOKOnly, "Soil Survey Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+
+If ImportMetadata Then
+    '
+    'Replace the contents of the SSURGO Static Metadata tables.
+    '
+    'Delete the existing contents of the SSURGO Static Metadata tables.
+    '
+    rcode = Reset_SSURGO_Static_Metadata_Tables()
+    If rcode <> 0 Then GoTo import_processed_unloadDone
+    '
+    'Import data from ASCII delimited files into the SSURGO Static Metadata tables.
+    '
+    rcode = Import_SSURGO_Static_Metadata(import_dir_path)
+    If rcode <> 0 Then GoTo import_processed_unloadDone
+End If
+'
+'Process any Soil Data Viewer related data that was included in the export.
+'
+'Reset the SDV import transaction tables.
+'
+rcode = Reset_SDV_Transaction_Tables()
+If rcode <> 0 Then GoTo import_processed_unloadDone
+'
+'Import data from ASCII delimited files into the SDV import transaction tables.
+'
+If FileExists(import_dir_path & "sdvalgorithm.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into SYSTEM - sdvalgorithm...")
+    DoCmd.TransferText acImportDelim, "sdvalgorithm Import Specification", "SYSTEM - sdvalgorithm", import_dir_path & "sdvalgorithm.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "sdvalgorithm.txt was not found.", vbCritical + vbOKOnly, "SDV Driver Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "sdvattribute.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into SYSTEM - sdvattribute...")
+    DoCmd.TransferText acImportDelim, "sdvattribute Import Specification", "SYSTEM - sdvattribute", import_dir_path & "sdvattribute.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "sdvattribute.txt was not found.", vbCritical + vbOKOnly, "SDV Driver Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "sdvfolder.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into SYSTEM - sdvfolder...")
+    DoCmd.TransferText acImportDelim, "sdvfolder Import Specification", "SYSTEM - sdvfolder", import_dir_path & "sdvfolder.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "sdvfolder.txt was not found.", vbCritical + vbOKOnly, "SDV Driver Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+If FileExists(import_dir_path & "sdvfolderattribute.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into SYSTEM - sdvfolderattribute...")
+    DoCmd.TransferText acImportDelim, "sdvfolderattribute Import Specification", "SYSTEM - sdvfolderattribute", import_dir_path & "sdvfolderattribute.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "sdvfolderattribute.txt was not found.", vbCritical + vbOKOnly, "SDV Driver Data Import Error")
+    GoTo import_processed_unloadErr
+End If
+'
+'Process updates and appends to the SDV driver data.
+'
+rcode = Update_SDV_Data()
+If rcode <> 0 Then GoTo import_processed_unloadDone
+'
+'Reset the SDV import transaction tables.
+'
+rcode = Reset_SDV_Transaction_Tables()
+If rcode <> 0 Then GoTo import_processed_unloadDone
+'
+'If spatial data was included for the SSA in question, import the special feature descriptions, if any.
+'Note that no special feature descriptions will ever be provided for STATSGO data, but the logic below
+'shouldn't attempt to import any data in that case because it is looking for a unique file name.
+'The name of the special feature descriptions file for a SSRUGO export should be similar to "soilsf_t_ca077.txt".
+'The name of the special feature descriptions file for an AOI export should be "".
+'
+position = InStr(1, import_dir_path, "\tabular", vbTextCompare)
+If Not IsNull(position) Then
+    import_dir_path = Left(import_dir_path, position - 1)
+    areasymbol = ""
+    If position > 5 Then areasymbol = Right(import_dir_path, 5)
+    import_dir_path = import_dir_path & "\spatial\"
+    'Does the spatial directory exist?
+    If FileExists(import_dir_path, True) Then
+        'Is this an AOI export or a SSURGO export?
+        If FileExists(import_dir_path & "soilsf_t_aoi.txt") Then
+            'Attempt to import the special feature descriptions from an AOI export.
+            rcode = SysCmd(GenericSetStatus, "Importing into featdesc...")
+            DoCmd.TransferText acImportDelim, "featdesc Import Specification", "featdesc", import_dir_path & "soilsf_t_aoi.txt"
+        ElseIf FileExists(import_dir_path & "soilsf_t_" & areasymbol & ".txt") Then
+            'Attempt to import the special feature descriptions from a SSURGO export.
+            rcode = SysCmd(GenericSetStatus, "Importing into featdesc...")
+            DoCmd.TransferText acImportDelim, "featdesc Import Specification", "featdesc", import_dir_path & "soilsf_t_" & areasymbol & ".txt"
+        End If
+    End If
+End If
+
+return_code = 0
+import_processed_unloadDone:
+rcode = SysCmd(GenericClearStatus)
+dbsDatabaseImport.Close
+Exit Sub
+import_processed_unloadErr:
+return_code = 1
+On Error GoTo 0
+Resume import_processed_unloadDone
+End Sub
+
+Function Import_SSURGO_Static_Metadata(import_dir_path As Variant) As Integer
+Dim rcode As Variant
+Dim msgboxresponse As Integer
+
+On Error GoTo Import_SSURGO_Static_MetadataErr
+
+If FileExists(import_dir_path & "msdommas.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstatdommas...")
+    DoCmd.TransferText acImportDelim, "msdommas Import Specification", "mdstatdommas", import_dir_path & "msdommas.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "msdommas.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "msdomdet.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstatdomdet...")
+    DoCmd.TransferText acImportDelim, "msdomdet Import Specification", "mdstatdomdet", import_dir_path & "msdomdet.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "msdomdet.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "mstab.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstattabs...")
+    DoCmd.TransferText acImportDelim, "mstab Import Specification", "mdstattabs", import_dir_path & "mstab.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "mstab.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "mstabcol.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstattabcols...")
+    DoCmd.TransferText acImportDelim, "mstabcol Import Specification", "mdstattabcols", import_dir_path & "mstabcol.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "mstabcol.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "msidxmas.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstatidxmas...")
+    DoCmd.TransferText acImportDelim, "msidxmas Import Specification", "mdstatidxmas", import_dir_path & "msidxmas.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "msidxmas.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "msidxdet.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstatidxdet...")
+    DoCmd.TransferText acImportDelim, "msidxdet Import Specification", "mdstatidxdet", import_dir_path & "msidxdet.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "msidxdet.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "msrsmas.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstatrshipmas...")
+    DoCmd.TransferText acImportDelim, "msrsmas Import Specification", "mdstatrshipmas", import_dir_path & "msrsmas.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "msrsmas.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+If FileExists(import_dir_path & "msrsdet.txt") Then
+    rcode = SysCmd(GenericSetStatus, "Importing into mdstatrshipdet...")
+    DoCmd.TransferText acImportDelim, "msrsdet Import Specification", "mdstatrshipdet", import_dir_path & "msrsdet.txt"
+Else
+    msgboxresponse = MsgBox("File " & import_dir_path & "msrsdet.txt was not found.", vbCritical + vbOKOnly, "SSURGO Metadata Import Error")
+    GoTo Import_SSURGO_Static_MetadataErr
+End If
+
+Import_SSURGO_Static_Metadata = 0
+Import_SSURGO_Static_MetadataDone:
+rcode = SysCmd(GenericClearStatus)
+Exit Function
+Import_SSURGO_Static_MetadataErr:
+Import_SSURGO_Static_Metadata = 1
+On Error GoTo 0
+Resume Import_SSURGO_Static_MetadataDone
+
+End Function
+
+Function Reset_SDV_Transaction_Tables() As Integer
+Dim dbsDatabaseImport As Database
+Dim qdfTemp As QueryDef
+Dim rcode As Variant
+
+Set dbsDatabaseImport = DBEngine.Workspaces(0).Databases(0)
+
+On Error GoTo Reset_SDV_Transaction_TablesErr
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [SYSTEM - sdvalgorithm]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [SYSTEM - sdvattribute]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [SYSTEM - sdvfolder]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [SYSTEM - sdvfolderattribute]")
+qdfTemp.Execute
+
+Reset_SDV_Transaction_Tables = 0
+Reset_SDV_Transaction_TablesDone:
+rcode = SysCmd(GenericClearStatus)
+dbsDatabaseImport.Close
+Exit Function
+Reset_SDV_Transaction_TablesErr:
+Reset_SDV_Transaction_Tables = 1
+On Error GoTo 0
+Resume Reset_SDV_Transaction_TablesDone
+End Function
+
+
+Function Reset_SSURGO_Static_Metadata_Tables() As Integer
+Dim dbsDatabaseImport As Database
+Dim qdfTemp As QueryDef
+Dim rcode As Variant
+
+Set dbsDatabaseImport = DBEngine.Workspaces(0).Databases(0)
+
+On Error GoTo Reset_SSURGO_Static_Metadata_TablesErr
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstatrshipdet]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstatrshipmas]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstatidxdet]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstatidxmas]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstattabcols]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstattabs]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstatdomdet]")
+qdfTemp.Execute
+
+Set qdfTemp = dbsDatabaseImport.CreateQueryDef("", "Delete from [mdstatdommas]")
+qdfTemp.Execute
+
+Reset_SSURGO_Static_Metadata_Tables = 0
+Reset_SSURGO_Static_Metadata_TablesDone:
+rcode = SysCmd(GenericClearStatus)
+dbsDatabaseImport.Close
+Exit Function
+Reset_SSURGO_Static_Metadata_TablesErr:
+Reset_SSURGO_Static_Metadata_Tables = 1
+On Error GoTo 0
+Resume Reset_SSURGO_Static_Metadata_TablesDone
+End Function
+
+Function Update_SDV_Data() As Integer
+Dim rcode As Variant
+
+On Error GoTo Update_SDV_DataErr
+
+DoCmd.SetWarnings 0
+
+'Append new records to table sdvalgorithm.
+DoCmd.OpenQuery "SDV - sdvalgorithm - Append"
+'Update existing records in table sdvalgorithm.
+DoCmd.OpenQuery "SDV - sdvalgorithm - Update"
+
+'Append new records to table sdvattribute.
+DoCmd.OpenQuery "SDV - sdvattribute - Append"
+'Update existing records in table sdvattribute where
+'the last modified date is less than the last modified
+'date of the corresponding record in the sdvattribute
+'import transaction table.
+DoCmd.OpenQuery "SDV - sdvattribute - Update"
+
+'Append new records to table sdvfolder.
+DoCmd.OpenQuery "SDV - sdvfolder - Append"
+'Update existing records in table sdvfolder where
+'the last modified date is less than the last modified
+'date of the corresponding record in the sdvfolder
+'import transaction table.
+DoCmd.OpenQuery "SDV - sdvfolder - Update"
+
+'Append new records to table sdvfolderattribute.
+DoCmd.OpenQuery "SDV - sdvfolderattribute - Append"
+'Becase this table has no attributes other than the two
+'primary key attributes, it is never necessary to update
+'a record in this table.
+
+DoCmd.SetWarnings 1
+
+Update_SDV_Data = 0
+Update_SDV_DataDone:
+rcode = SysCmd(GenericClearStatus)
+Exit Function
+Update_SDV_DataErr:
+Update_SDV_Data = 1
+On Error GoTo 0
+Resume Update_SDV_DataDone
+End Function
+
+
+
+
+Sub Verify_Version_Info(import_dir_path As Variant, ImportMetadata As Boolean, return_code As Integer)
+'
+'This function determines if the data a user is trying to import is compatible
+'with the current SSURGO Template database.  It also determines whether or not
+'the corresponding SSURGO Metadata should be imported.  SSURGO metadata is
+'import only the version of the SSURGO Metadata about to potentially be imported
+'is greater than the version of the SSURGO Metadata that already resides in the
+'database.
+'
+Dim rcode As Variant
+Dim VersionString As String
+Dim LeftmostDecimalPosition As Variant
+Dim SSURGOVersion As Integer
+Dim ImportDataModelVersion As Integer
+Dim MetadataVersion As Integer
+
+On Error GoTo Verify_Version_InfoErr:
+
+ImportMetadata = False
+
+'Verify that the location specified in the import directory path specification actually exists.
+If Not FileExists(import_dir_path, True) Then
+    rcode = MsgBox("The directory you have specified was not found.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+
+'Verify that the file "version.txt" resides at the specified location.
+If Not FileExists(import_dir_path & "version.txt") Then
+    rcode = MsgBox("Required file ""version.txt"" does not reside at the specified location.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+'Attempt to extract SSURGO version.
+VersionString = ""
+Open import_dir_path & "version.txt" For Input As #1
+If Not EOF(1) Then Input #1, VersionString
+Close #1
+If Len(VersionString) < 5 Or IsNull(VersionString) Then
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is either empty or not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+LeftmostDecimalPosition = InStr(1, VersionString, ".", vbTextCompare)
+If IsNull(LeftmostDecimalPosition) Or LeftmostDecimalPosition < 2 Then
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+If (IsNumeric(Left(VersionString, LeftmostDecimalPosition - 1)) And Len(Left(VersionString, LeftmostDecimalPosition - 1)) < 4) Then
+    SSURGOVersion = CInt(Left(VersionString, LeftmostDecimalPosition - 1))
+    VersionString = mid(VersionString, LeftmostDecimalPosition + 1)
+    If SSURGOVersion <> ExpectedSSURGOVersion Then
+        rcode = MsgBox("The SSURGO version of data you are attempting to import is not compatible with this database.", vbOKOnly + vbCritical, "Import Error")
+        GoTo Verify_Version_InfoFails:
+    End If
+Else
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+
+'Attempt to extract Import Data Model Version.
+If Len(VersionString) < 3 Or IsNull(VersionString) Then
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+LeftmostDecimalPosition = InStr(1, VersionString, ".", vbTextCompare)
+If IsNull(LeftmostDecimalPosition) Or LeftmostDecimalPosition < 2 Then
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+If (IsNumeric(Left(VersionString, LeftmostDecimalPosition - 1)) And Len(Left(VersionString, LeftmostDecimalPosition - 1)) < 4) Then
+    ImportDataModelVersion = CInt(Left(VersionString, LeftmostDecimalPosition - 1))
+    VersionString = mid(VersionString, LeftmostDecimalPosition + 1)
+    If ImportDataModelVersion <> ExpectedImportDataModelVersion Then
+        rcode = MsgBox("The Data Model version of data you are attempting to import is not compatible with this database.", vbOKOnly + vbCritical, "Import Error")
+        GoTo Verify_Version_InfoFails:
+    End If
+Else
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+
+'Verify that a Metadata Version was provided.
+If IsNull(VersionString) Then
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+If (IsNumeric(VersionString) And Len(VersionString) < 4) Then
+    MetadataVersion = CInt(VersionString)
+    If MetadataVersion > BaseMetadataVersion Then
+        ImportMetadata = True
+    Else
+        ImportMetadata = False
+    End If
+Else
+    rcode = MsgBox("Unable to complete version check.  File ""version.txt"" is not in the proper format.", vbOKOnly + vbCritical, "Import Error")
+    GoTo Verify_Version_InfoFails:
+End If
+
+return_code = 0
+
+Verify_Version_InfoDone:
+Exit Sub
+
+Verify_Version_InfoFails:
+return_code = 1
+GoTo Verify_Version_InfoDone
+
+Verify_Version_InfoErr:
+On Error GoTo 0
+rcode = MsgBox("Unable to complete version check.  An unanticipated error occurred.", vbOKOnly + vbCritical, "Import Error")
+return_code = 1
+Resume Verify_Version_InfoDone
+
+End Sub
+
+

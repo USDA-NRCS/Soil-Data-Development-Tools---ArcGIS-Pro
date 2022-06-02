@@ -1,0 +1,81 @@
+NASS Cropland CRS acccording to ArcCatalog:
+
+PROJCS['NAD_1983_Contiguous_USA_Albers', GEOGCS['GCS_North_American_1983', DATUM['D_North_American_1983', SPHEROID 'GRS_1980',6378137.0,298.257222101]], PRIMEM['Greenwich',0.0],UNIT['Degree',0.0174532925199433]], PROJECTION['Albers'], PARAMETER['false_easting',0.0], PARAMETER['false_northing',0.0], PARAMETER['central_meridian',-96.0], PARAMETER['standard_parallel_1',29.5], PARAMETER['standard_parallel_2',45.5], PARAMETER['latitude_of_origin',23.0], UNIT['Meter',1.0]]
+
+
+Closest ESRI CRS according to epsg.io. There is a slight difference in the UNIT definition which carries the fraction 2 more places:
+
+PROJCS["NAD83_Conus_Albers",GEOGCS["GCS_North_American_1983",DATUM["D_North_American_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Albers"],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["latitude_of_origin",23],PARAMETER["central_meridian",-96],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["Meter",1]]
+
+Here is 5070 in OGC WKT format:
+
+PROJCS["NAD83 / Conus Albers",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0,0,0,0,0,0,0],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],AUTHORITY["EPSG","5070"]]
+
+
+5070   this MIGHT be the correct EPSG code, but it also appears to include a TOWGS84 of zeros
+
+102008 this is definitely not the correct EPSG
+
+102003 this is definitely not the correct EPSG
+
+Somebody commented that ArcGIS threw an error if other than 'NAD_1983_Contiguous_USA_Albers' was used.
+
+==================================
+
+2011 TOWGS84 parameter notes from GeoTIFF Wiki by Frank Warmerdam. I am not sure if this was adopted. SDP
+
+OGC TOWGS84 Definition
+That document defines the parameter this way:
+
+This indicates a list of up to 7 Bursa Wolf transformation parameters. These parameters can be used to approximate a transformation from the horizontal datum to the WGS84 datum. However, it must be remembered that this transformation is only an approximation. For a given horizontal datum, different Bursa Wolf transformations can be used to minimize the errors over different regions.
+
+If the DATUM clause contains a TOWGS84 clause, then this should be its "preferred" transformation, which will often be the transformation which gives a broad approximation over the whole area of interest (e.g. the area of interest in the containing geographic coordinate system). Sometimes, only the first three or six parameters are defined. In this case the remaining parameters must be zero. If only three parameters are defined, then they can still be plugged into the Bursa Wolf formulas, or you can take a short cut. The Bursa Wolf transformation works on geocentric coordinates, so you cannot apply it onto geographic coordinates directly. If there are only three parameters then you can use the Molodenski or abridged Molodenski formulas.
+
+The DATUM clause may not contain a TOWGS84 clause in the following situations:
+
+a) The writing application was using the Simple Features specification, which does not specify TOWGS84 as a valid keyword
+
+b) The writing application did not have an available transformation.
+
+c) There is no possible transformation. For example, the horizontal datum could be a surface that rotates relative to the Earth's surface.
+
+In particular, if the DATUM does contain a TOWGS84 clause, and the parameter values are zero, then the receiving application can assume that the writing application believed that the datum is approximately equal to WGS84.
+
+Parameter Definition
+GeogTOWGS84GeoKey
+
+KeyID = 2062
+Type = 3/7 * DOUBLE
+Values = dX, dY, dZ, Rx, Ry, Rz, dS
+This key allows the specification of a position vector 7 parameter transformation (as defined by EPSG:9606) between the coordinate reference system of the file and the WGS84 system. dX, dY and dZ define the translation vector and are given in meters. Rx, Ry and Rz define the rotation in seconds of an arc. dS is the scale correction expressed in parts per million.
+
+Note that there exists another 7 parameter transformation (the coordinate frame rotation, EPSG:9607) which differs from the method used here only in the signs of the rotation parameters Rx, Ry, Rz.
+
+Also the more simple 3 parameter transformation (geocentric translation, EPSG:9603) can be expressed with this geokey by simply setting Rx, Ry, Rz and dS to zero.
+
+===================================================================
+
+https://desktop.arcgis.com/en/arcmap/latest/map/projections/pdf/geographic_transformations.pdf
+
+WGS_1984_(ITRF00)_To_NAD_1983 108190 Coordinate_Frame 
+0.9956 
+-1.9013 
+-0.5215 
+0.025915 
+0.009426 
+0.011599 
+0.00062
+
+dx = x axis translation (meters)
+dy = y axis translation (meters)
+dz = z axis translation (meters)
+rx = x axis rotation (arc-seconds)
+ry = y axis rotation (arc-seconds)
+rz = z axis rotation (arc-seconds)
+ds = scale difference (parts per million, ppm)
+
+EPSG 5070
+PROJCS["NAD83 / Conus Albers",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],TOWGS84[0.9956,-1.9013,-0.5215,0.025915,0.009426,0.011599,0.00062],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Albers_Conic_Equal_Area"],PARAMETER["standard_parallel_1",29.5],PARAMETER["standard_parallel_2",45.5],PARAMETER["latitude_of_center",23],PARAMETER["longitude_of_center",-96],PARAMETER["false_easting",0],PARAMETER["false_northing",0],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["X",EAST],AXIS["Y",NORTH],AUTHORITY["EPSG","5070"]]
+
+
+

@@ -1,0 +1,28 @@
+Fix for spatialite missing views
+
+ks_qgis_spatialite01.sqlite first test
+
+1. views_geometry_columns  needs to be included in template.
+view_name, view_geometry, view_rowid, f_table_name, geometry_column, read_only
+
+2. views_geometry_columns_auth
+view_name, view_geometry, hidden
+
+Still need to look at extents for views in spatialite. Takes time to calculate
+when adding to map.
+
+Will try populating the table [geometry_columns_statistics]
+f_table_name, f_geometry_column, last_verified, row_count, extent_min_x, extent_min_y, extent_max_x, extent_max_y
+
+format for last_verified: 2021-03-15T13:03:45.602Z
+
+kansas extents
+W 
+S 
+E 
+N 
+w	-102.05171323199994
+s	36.99309473900007
+e	-94.58867304499995
+n	40.00324004300006
+

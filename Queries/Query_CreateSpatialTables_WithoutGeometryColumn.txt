@@ -1,0 +1,57 @@
+CREATE TABLE featline (
+objectid INTEGER PRIMARY KEY AUTOINCREMENT
+--, shape MULTILINESTRING, areasymbol TEXT
+, spatialver BIGINT
+, featsym TEXT
+, featkey BIGINT
+, FOREIGN KEY (featkey) REFERENCES featdesc(featkey)
+);
+
+CREATE TABLE featpoint (
+objectid INTEGER PRIMARY KEY AUTOINCREMENT
+--, shape MULTILINESTRING
+, areasymbol TEXT
+, spatialver BIGINT
+, featsym TEXT
+, featkey BIGINT
+, FOREIGN KEY (featkey) REFERENCES featdesc(featkey)
+);
+
+CREATE TABLE muline (
+objectid INTEGER PRIMARY KEY AUTOINCREMENT
+--, shape MULTILINESTRING
+, areasymbol TEXT
+, spatialver BIGINT
+, musym TEXT
+, mukey BIGINT
+, FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+
+CREATE TABLE mupoint (
+objectid INTEGER PRIMARY KEY AUTOINCREMENT
+--, shape MULTILINESTRING
+, areasymbol TEXT
+, spatialver BIGINT
+, musym TEXT
+, mukey BIGINT
+, FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+
+CREATE TABLE mupolygon (
+objectid INTEGER PRIMARY KEY AUTOINCREMENT
+--, shape MULTIPOLYGON
+, areasymbol TEXT
+, spatialver BIGINT
+, musym TEXT
+, mukey BIGINT
+, FOREIGN KEY (mukey) REFERENCES mapunit(mukey)
+);
+
+CREATE TABLE sapolygon ("objectid INTEGER PRIMARY KEY AUTOINCREMENT
+--, shape MULTIPOLYGON
+, areasymbol TEXT
+, spatialver BIGINT
+, lkey BIGINT
+, FOREIGN KEY (lkey) REFERENCES legend(lkey)
+);
+

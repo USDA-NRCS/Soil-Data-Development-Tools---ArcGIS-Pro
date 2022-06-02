@@ -1,0 +1,100 @@
+-- AWS and AWC WTA 0 to 30cm;  Clay WTA 0 to 30cm; TFactor DCD; Ecological Site DCD
+-- top depth and bottom depth variables must be substituted into the query.
+-- Does not properly handle multiple ecologicalsitetypes.
+-- SQLite example 2021-03-02 Peaslee
+DROP TABLE IF EXISTS temp.CompAll;
+
+CREATE TEMP TABLE temp.CompAll (
+areasymbol, musym, muname, compname, comppct_r, ecoclassid, ecoclassname, mukey, cokey
+);
+
+INSERT INTO temp.CompAll
+SELECT areasymbol, musym, muname, 
+compname, comppct_r, ecoclassid, ecoclassname, M.mukey, C.cokey
+FROM legend L
+INNER JOIN mapunit M ON L.lkey = M.lkey
+LEFT OUTER JOIN component C ON M.mukey = C.mukey
+LEFT OUTER JOIN coecoclass E ON C.cokey = E.cokey AND ecoclassref IS NOT NULL
+ORDER BY areasymbol, M.musym ASC, comppct_r DESC;
+
+-- Get Ecological Site info with sum of comppct by map unit
+DROP TABLE IF EXISTS temp.Eco;
+CREATE TEMP TABLE temp.Eco (
+areasymbol, mukey, comppct_eco, ecoclassid, ecoclassname
+);
+
+INSERT INTO temp.Eco
+SELECT areasymbol, mukey, 
+SUM(comppct_r) AS compct_eco, 
+ecoclassid, ecoclassname
+FROM temp.CompAll
+GROUP BY areasymbol, mukey, ecoclassid, ecoclassname
+ORDER BY areasymbol, mukey, comppct_r DESC
+;
+
+-- Get ecological site, dominant condition
+DROP TABLE IF EXISTS temp.EcoDCD;
+
+CREATE TEMP TABLE temp.EcoDCD (
+areasymbol, mukey, comppct_eco, ecoclassid, ecoclassname, edit_url
+);
+
+INSERT INTO temp.EcoDCD
+SELECT areasymbol, mukey, comppct_eco, ecoclassid, ecoclassname, ('https://edit.jornada.nmsu.edu/catalogs/esd/' || SUBSTR(ecoclassid, 2, 4) || '/' || ecoclassid) AS edit_url
+FROM temp.Eco
+GROUP BY mukey HAVING ROWID = MIN(ROWID)
+ORDER BY mukey;
+
+-- Return Map unit summary value for AWS, weighted average for AWC and Percent Clay
+DROP TABLE IF EXISTS main.mapunitecosite_dcd;
+
+CREATE TABLE mapunitecosite_dcd(
+  areasymbol CHARACTER(20),
+  musym CHARACTER(6),
+  muname CHARACTER(240),
+  comppct_eco INTEGER,
+  ecoclassid CHARACTER(30),
+  ecoclassname CHARACTER(240),
+  edit_url CHARACTER(254),
+  mukey INTEGER PRIMARY KEY);
+
+INSERT INTO mapunitecosite_dcd
+SELECT E.areasymbol, M.musym, M.muname,
+comppct_eco, ecoclassid, ecoclassname, edit_url, E.mukey
+FROM temp.EcoDCD AS E
+INNER JOIN mapunit AS M ON E.mukey = M.mukey
+GROUP BY areasymbol, musym, muname, E.mukey
+ORDER BY areasymbol, E.mukey;
+
+CREATE INDEX PK_mapunitecosite_dcd ON mapunitecosite_dcd(mukey);
+
+-- ***********************************************************************************
+
+-- ***********************************************************************************
+-- Create spatial views from mupolygon and the two tables
+--
+-- Example URL: https://edit.jornada.nmsu.edu/catalogs/esd/078B/R078BY080TX
+CREATE VIEW view_ecosite AS
+SELECT P.objectid, P.shape, P.mukey, P.areasymbol, spatialver, P.musym, E.muname,
+comppct_eco, ecoclassid, ecoclassname, edit_url
+FROM mupolygon AS P
+INNER JOIN mapunitecosite_dcd AS E ON P.mukey = E.mukey
+ORDER BY P.OBJECTID ;
+
+-- register view_ecosite for spatialite database
+INSERT INTO views_geometry_columns (view_name, view_geometry, view_rowid, f_table_name, f_geometry_column, read_only) 
+VALUES ('view_ecosite', 'shape', 'objectid', 'mupolygon', 'shape', 1);
+
+-- register spatial view geometry column for spatialite database
+INSERT INTO views_geometry_columns_auth (view_name, view_geometry, hidden) 
+VALUES ('view_ecosite', 'shape', 0);
+
+-- register spatial view extents
+INSERT INTO  views_geometry_columns_statistics (view_name, view_geometry, last_verified, row_count, extent_min_x, extent_min_y, extent_max_x, extent_max_y)
+SELECT 'view_ecosite' AS view_name, f_geometry_column AS view_geometry, last_verified, row_count, extent_min_x, extent_min_y, extent_max_x, extent_max_y
+FROM geometry_columns_statistics WHERE f_table_name = 'mupolygon' LIMIT 1 ;
+
+-- register new view to a geopackage database
+-- INSERT INTO gpkg_contents( table_name, data_type, identifier, description ) 
+-- VALUES ('view_ecosite', 'features', 'View Ecosites', 'Ecological Site Name for dominant condition');
+

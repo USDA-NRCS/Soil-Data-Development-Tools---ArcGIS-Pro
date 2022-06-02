@@ -1,0 +1,47 @@
+-- In DB Browser, attach the database containing the updated metadata tables (SSURGO-Lite) as 'MD'
+-- Not sure if the order of execution is correct. I had problems with that.
+-- After successfully running these scripts, detach the 'MD' database: DETACH DATABASE 'MD';
+
+INSERT INTO mdstattabs
+SELECT tabphyname, tablogname, tablabel, tabdesc, iefilename 
+FROM MD.mdstattabs
+;
+
+INSERT INTO mdstattabcols (tabphyname, colsequence, colphyname, collogname, collabel, logicaldatatype, notnull_, fieldsize, precision, minimum, maximum, uom, domainname, coldesc)
+SELECT tabphyname, colsequence, colphyname, collogname, collabel, logicaldatatype, notnull_, fieldsize, precision_, minimum, maximum, uom, domainname, coldesc
+FROM MD.mdstattabcols;
+
+INSERT INTO mdstatdommas
+SELECT domainname, domainmaxlen
+FROM MD.mdstatdommas
+;
+
+INSERT INTO mdstatidxmas
+SELECT tabphyname, idxphyname, uniqueindex
+FROM MD.mdstatidxmas
+;
+
+INSERT INTO mdstatdomdet
+SELECT domainname, choicesequence, choice, choicedesc, choiceobsolete
+FROM MD.mdstatdomdet
+;
+
+INSERT INTO mdstatrshipmas
+SELECT ltabphyname, rtabphyname, relationshipname, cardinality, mandatory
+FROM mdstatrshipmas
+;
+
+INSERT INTO mdstatrshipdet 
+SELECT ltabphyname, rtabphyname, relationshipname, ltabcolphyname, rtabcolphyname
+FROM MD.mdstatrshipdet
+;
+
+INSERT INTO mdstatidxdet
+SELECT tabphyname, idxphyname, idxcolsequence, colphyname
+FROM MD.mdstatidxdet
+;
+
+
+
+
+

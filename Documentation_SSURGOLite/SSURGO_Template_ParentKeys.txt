@@ -1,0 +1,113 @@
+
+Primary keys for soil attribute tables in SSURGO Template database (.mdb)
+
+chaashto: chaashtokey
+chconsistence: chconsistkey
+chdesgnsuffix: chdesgnsfxkey
+chfrags: chfragskey
+chorizon: chkey
+chpores: chporeskey
+chstruct: chstructkey
+chstructgrp: chstructgrpkey
+chtext: chtextkey
+chtexture: chtkey
+chtexturegrp: chtgkey
+chtexturemod: chtexmodkey
+chunified: chunifiedkey
+cocanopycover: cocanopycovkey
+cocropyld: cocropyldkey
+codiagfeatures: codiagfeatkey
+coecoclass: coecoclasskey
+coeplants: coeplantskey
+coerosionacc: coeroacckey
+coforprod: cofprodkey
+coforprodo: cofprodokey
+cogeomordesc: cogeomdkey
+cohydriccriteria: cohydcritkey
+cointerp: cointerpkey
+comonth: comonthkey
+component: cokey
+copm: copmkey
+copmgrp: copmgrpkey
+copwindbreak: copwindbreakkey
+corestrictions: corestrictkey
+cosoilmoist: cosoilmoistkey
+cosoiltemp: cosoiltempkey
+cosurffrags: cosurffragskey
+cosurfmorphgc: cosurfmorgckey
+cosurfmorphhpp: cosurfmorhppkey
+cosurfmorphmr: cosurfmormrkey
+cosurfmorphss: cosurfmorsskey
+cotaxfmmin: cotaxfmminkey
+cotaxmoistcl: cotaxmckey
+cotext: cotextkey
+cotreestomng: cotreestomngkey
+cotxfmother: cotaxfokey
+distinterpmd: distinterpmdkey
+distlegendmd: distlegendmdkey
+distmd: distmdkey
+featdesc: featkey
+laoverlap: lareaovkey
+legend: lkey
+legendtext: legtextkey
+mapunit: mukey
+mdstatdomdet: domainname
+mdstatdomdet: choicesequence
+mdstatdommas: domainname
+mdstatidxdet: tabphyname
+mdstatidxdet: idxphyname
+mdstatidxdet: idxcolsequence
+mdstatidxmas: tabphyname
+mdstatidxmas: idxphyname
+mdstatrshipdet: ltabphyname
+mdstatrshipdet: rtabphyname
+mdstatrshipdet: relationshipname
+mdstatrshipdet: ltabcolphyname
+mdstatrshipdet: rtabcolphyname
+mdstatrshipmas: ltabphyname
+mdstatrshipmas: rtabphyname
+mdstatrshipmas: relationshipname
+mdstattabcols: tabphyname
+mdstattabcols: colsequence
+mdstattabs: tabphyname
+month: monthname
+muaggatt: mukey
+muaoverlap: muareaovkey
+mucropyld: mucrpyldkey
+mutext: mutextkey
+sacatalog: sacatalogkey
+sainterp: sainterpkey
+sdvalgorithm: algorithmname
+sdvattribute: attributekey
+sdvfolder: folderkey
+sdvfolderattribute: folderkey
+sdvfolderattribute: attributekey
+SYSTEM - Geomorphic Feature: geomfiid
+SYSTEM - Geomorphic Feature Type: geomftiid
+SYSTEM - Help Text: HelpTextKey
+SYSTEM - Interp Depth Sequence: cointerpkey
+SYSTEM - Long Leaf Pine Counties: countycode
+SYSTEM - Mapunit Sort Specifications: lseq
+SYSTEM - Mapunit Sort Specifications: museq
+SYSTEM - Palouse Soil Survey Areas: STSSAID
+SYSTEM - Report Parameters - Counties or Parishes: County or Parish Sequence
+SYSTEM - Report Parameters - Crops: Crop Sequence
+SYSTEM - Report Parameters - Interpretations: Interpretation Name
+SYSTEM - Report Parameters - Map Unit Description Categories: Map Unit Description Category Sequence
+SYSTEM - Report Parameters - Text Kinds and Categories: Text Kind and Category Sequence
+SYSTEM - sdvalgorithm: algorithmname
+SYSTEM - sdvattribute: attributekey
+SYSTEM - sdvfolder: folderkey
+SYSTEM - sdvfolderattribute: folderkey
+SYSTEM - sdvfolderattribute: attributekey
+SYSTEM - Selected Legend Key: lkey
+SYSTEM - Selected Mapunit Keys: mukey
+SYSTEM - Soil Reports: Report Key
+SYSTEM - Soil Reports - Interpretations: Report Key
+SYSTEM - Soil Reports - Interpretations: Rule Sequence
+SYSTEM - Soil Survey Area: Legend Key
+SYSTEM - Survey Area-County Geographic Coincidence: stcoid
+SYSTEM - Survey Area-County Geographic Coincidence: stssaid
+SYSTEM - System Reports: Report Key
+SYSTEM - Template Database Information: Item Name
+

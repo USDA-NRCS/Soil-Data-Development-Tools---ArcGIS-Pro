@@ -1,0 +1,31 @@
+-- Total acres for featureclass
+SELECT ROUND((SUM(ST_Area(shape)) * 0.00024711) AS acres_total
+;
+
+-- Total acres by areasymbol for featureclass
+SELECT M.areasymbol, L.areaname, ROUND((SUM(ST_Area(shape)) * 0.00024711), 1) AS acres_ssa 
+FROM mupolygon AS M
+INNER JOIN legend AS L ON M.areasymbol = L.areasymbol
+GROUP BY M.areasymbol, areaname
+ORDER BY M.areasymbol
+;
+
+
+-- total acres by mapunit
+SELECT M.areasymbol, L.areaname, M.mukey, Mu.musym, Mu.muname, ROUND((SUM(ST_Area(shape)) * 0.00024711), 1) AS acres_mapunit 
+FROM mupolygon AS M
+INNER JOIN mapunit AS MU ON M.mukey = MU.mukey
+INNER JOIN legend AS L ON M.areasymbol = L.areasymbol
+GROUP BY M.areasymbol, M.mukey
+ORDER BY M.areasymbol, M.mukey
+;
+
+-- total county acres by mapunit
+SELECT M.areasymbol, L.areaname, M.mukey, Mu.musym, Mu.muname, ROUND((SUM(ST_Area(shape)) * 0.00024711), 1) AS acres_mapunit 
+FROM mupolygon AS M
+INNER JOIN mapunit AS MU ON M.mukey = MU.mukey
+INNER JOIN legend AS L ON M.areasymbol = L.areasymbol
+INNER JOIN mu
+GROUP BY M.areasymbol, M.mukey
+ORDER BY M.areasymbol, M.mukey
+;

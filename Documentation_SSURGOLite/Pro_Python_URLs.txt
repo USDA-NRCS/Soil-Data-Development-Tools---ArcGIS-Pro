@@ -1,0 +1,5 @@
+Python in ArcGIS Pro:
+https://pro.arcgis.com/en/pro-app/latest/arcpy/get-started/installing-python-for-arcgis-pro.htm#ESRI_SECTION1_E66058ADDA284EE19A5160207A935
+
+Running a standalone script using the ArcPro Python:
+https://pro.arcgis.com/en/pro-app/latest/arcpy/get-started/using-conda-with-arcgis-pro.htm

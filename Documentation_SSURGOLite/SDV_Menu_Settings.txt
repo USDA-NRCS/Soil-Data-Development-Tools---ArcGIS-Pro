@@ -1,0 +1,36 @@
+# Handling depths....
+# In the past I have handled depth options a little differently than WSS.
+# dqmodeoptionflag is a boolean:  
+#     0 means that the option to set a depth range is disabled and the default 'depthqualifiermode' must be used. 'AASHTO Group Index' uses '0' and 'All Layers (Weighted Average)'.
+#     1 means that the option to set a depth range is enabled. 
+#         When the default 'depthqualifiermode' is 'Surface Layer' then set top depth to '0' and bottom depth to '1'.
+#         When the default 'depthqualifiermode' is 'Depth Range' then set both top depth and bottom depth to '0'. This will trigger a warning on top depth.
+#         All horizon-level properties have the option to use 'All Layers'. Need to add 'depthqualifiermode' choice list as another function.
+
+
+flagVars = ["mapunitlevelattribflag","complevelattribflag","cmonthlevelattribflag", \
+"horzlevelattribflag","tiebreakruleoptionflag","dqmodeoptionflag","depthqualifiermode", \
+"monthrangeoptionflag","interpretnullsaszerooptionflag","interpnullsaszeroflag","basicmodeflag"]
+
+dFlags["mapunitlevelattribflag"] influences Aggregation Method (3)
+
+dFlags["horzlevelattribflag"] = [7, 8]  
+
+dFlags["cmonthlevelattribflag"] = [9, 10]  top and bottom depths
+
+dFlags["tiebreakruleoptionflag"] = [11]    
+
+dFlags["interpretnullsaszerooptionflag"] = [12]
+
+dFlags["complevelattribflag"] = [13]
+
+
+11 Tie Break Rule
+
+12 Interpret null values as zero
+
+13 Component Percent Cutoff
+
+14 Exclude state interps
+
+15 Messages

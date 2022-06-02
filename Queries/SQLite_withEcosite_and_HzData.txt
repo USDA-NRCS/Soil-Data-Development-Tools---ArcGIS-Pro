@@ -1,0 +1,172 @@
+-- AWS and AWC WTA 0 to 30cm;  Clay WTA 0 to 30cm; TFactor DCD; Ecological Site DCD
+-- top depth and bottom depth variables must be substituted into the query.
+-- Does not properly handle multiple ecologicalsitetypes.
+-- SQLite example 2021-03-02 Peaslee
+DROP TABLE IF EXISTS temp.CompAll;
+
+CREATE TEMP TABLE temp.CompAll (
+areasymbol, musym, muname, compname, comppct_r, tfact, wei, geomdesc, ecoclassid, ecoclassname, mukey, cokey
+);
+
+INSERT INTO temp.CompAll
+SELECT areasymbol, musym, muname, 
+compname, comppct_r, tfact, wei, geomdesc, ecoclassid, ecoclassname, M.mukey, C.cokey
+FROM legend L
+INNER JOIN mapunit M ON L.lkey = M.lkey
+LEFT OUTER JOIN component C ON M.mukey = C.mukey
+LEFT OUTER JOIN coecoclass E ON C.cokey = E.cokey AND ecoclassref IS NOT NULL
+ORDER BY areasymbol, M.musym ASC, comppct_r DESC;
+
+DROP TABLE IF EXISTS temp.HzAll;
+
+CREATE TEMP TABLE temp.HzAll (
+areasymbol, musym, muname, compname, comppct_r, geomdesc, hzname, hzdept, hzdepb, awc_r, claytotal_r, mukey, cokey
+);
+
+INSERT INTO temp.HzAll
+SELECT areasymbol, musym, muname, 
+compname, comppct_r, geomdesc,
+hzname, 
+CASE
+WHEN hzdept_r <= 10 THEN 10
+WHEN hzdept_r > 10 THEN hzdept_r
+END AS hzdept, 
+CASE
+WHEN hzdepb_r <= 30 THEN hzdepb_r
+WHEN hzdepb_r > 30 THEN 30
+END AS hzdepb, 
+awc_r, claytotal_r, mukey, C.cokey
+FROM temp.CompAll C
+LEFT OUTER JOIN chorizon H ON C.cokey = H.cokey
+WHERE ((hzdept_r BETWEEN 10 AND 29 OR hzdepb_r BETWEEN 11 AND 30 ) OR ( hzdept_r < 10 AND hzdepb_r > 30 ))
+ORDER BY areasymbol, musym ASC, comppct_r DESC, hzdept_r ASC
+;
+
+-- Calculate weighted OM for each horizon
+DROP TABLE IF EXISTS temp.HzAWC;
+
+CREATE TEMP TABLE temp.HzAWC (
+areasymbol, musym, muname, compname, comppct_r, geomdesc, hzname, awc_hz, clay_hz, mukey, cokey
+);
+
+INSERT INTO temp.HzAWC
+SELECT areasymbol, musym, muname, compname, comppct_r, geomdesc, hzname, 
+((comppct_r / 100.0) * awc_r * (hzdepb - hzdept)) AS awc_hz, 
+((comppct_r / 100.0) * claytotal_r * (hzdepb - hzdept)) AS clay_hz, 
+mukey, cokey
+FROM temp.HzAll
+ORDER BY areasymbol, musym, comppct_r DESC
+;
+
+-- Get Ecological Site info with sum of comppct by map unit
+DROP TABLE IF EXISTS temp.Eco;
+CREATE TEMP TABLE temp.Eco (
+mukey, comppct_eco, ecoclassid, ecoclassname
+);
+
+INSERT INTO temp.Eco
+SELECT mukey, 
+SUM(comppct_r) AS compct_eco, 
+ecoclassid, ecoclassname
+FROM temp.CompAll
+GROUP BY mukey, ecoclassid, ecoclassname
+ORDER BY mukey, comppct_r DESC
+;
+
+-- Get ecological site, dominant condition
+DROP TABLE IF EXISTS temp.EcoDCD;
+
+CREATE TEMP TABLE temp.EcoDCD (
+mukey, comppct_eco, ecoclassid, ecoclassname, edit_url
+);
+
+INSERT INTO temp.EcoDCD
+SELECT mukey, comppct_eco, ecoclassid, ecoclassname, ('https://edit.jornada.nmsu.edu/catalogs/esd/' || SUBSTR(ecoclassid, 2, 4) || '/' || ecoclassid) AS edit_url
+FROM temp.Eco
+GROUP BY mukey HAVING ROWID = MIN(ROWID)
+ORDER BY mukey;
+
+-- Get TFactor by component
+DROP TABLE IF EXISTS temp.TFactors;
+
+CREATE TEMP TABLE temp.TFactors (
+mukey, comppct_tf, tfact
+);
+
+INSERT INTO temp.TFactors
+SELECT mukey, 
+SUM(comppct_r) AS compct_tf, 
+tfact
+FROM temp.CompAll
+GROUP BY mukey, tfact
+ORDER BY mukey, comppct_r DESC
+;
+
+-- Get TFactor dominant condition
+DROP TABLE IF EXISTS temp.TFactorDCD;
+
+CREATE TEMP TABLE temp.TFactorDCD (
+mukey, comppct_tf, tfact
+);
+
+INSERT INTO temp.TFactorDCD
+SELECT mukey, comppct_tf, tfact
+FROM temp.TFactors TF
+GROUP BY mukey HAVING ROWID = MIN(ROWID)
+ORDER BY mukey;
+
+-- Return Map unit summary value for AWS, weighted average for AWC and Percent Clay
+DROP TABLE IF EXISTS main.MapunitEcosite;
+
+CREATE TABLE MapunitEcosite(
+  areasymbol CHARACTER(20),
+  musym CHARACTER(6),
+  muname CHARACTER(240),
+  tfact INTEGER,
+  comppct_eco INTEGER,
+  ecoclassid CHARACTER(30),
+  ecoclassname CHARACTER(240),
+  edit_url CHARACTER(254),
+  aws_10to30cm REAL,
+  awc_10to30cm REAL,
+  clay_10to30cm REAL,
+  mukey INTEGER PRIMARY KEY);
+
+INSERT INTO MapunitEcosite
+SELECT areasymbol, musym, muname, tfact, 
+comppct_eco, ecoclassid, ecoclassname, edit_url,
+ROUND(SUM(awc_hz), 2) AS aws_10to30cm, 
+ROUND(SUM(awc_hz / (30.0 - 10.0)), 2) AS awc_10to30cm, 
+ROUND(SUM(clay_hz / (30.0 - 10.0)), 1) AS clay_10to30cm, 
+H.mukey
+FROM temp.HzAWC H
+LEFT OUTER JOIN temp.TFactorDCD TF ON H.mukey = TF.mukey
+LEFT OUTER JOIN temp.EcoDCD E ON H.mukey = E.mukey
+GROUP BY areasymbol, musym, muname, H.mukey
+ORDER BY areasymbol, H.mukey;
+-- ***********************************************************************************
+
+-- ***********************************************************************************
+-- Create spatial views from mupolygon and the two tables
+--
+-- Example URL: https://edit.jornada.nmsu.edu/catalogs/esd/078B/R078BY080TX
+CREATE VIEW view_ecosite AS
+SELECT P.objectid, P.shape, P.mukey, P.areasymbol, spatialver, P.musym, E.muname, tfact, 
+comppct_eco, ecoclassid, ecoclassname, edit_url, aws_10to30cm, awc_10to30cm, clay_10to30cm
+FROM mupolygon AS P
+INNER JOIN MapunitEcosite AS E ON P.mukey = E.mukey
+ORDER BY P.OBJECTID ;
+
+
+-- register spatial views to spatialite database
+-- register view_ecosite for spatialite databases
+-- INSERT INTO views_geometry_columns (view_name, view_geometry, view_rowid, f_table_name, f_geometry_column, read_only) 
+-- VALUES ('view_ecosite', 'shape', 'objectid', 'mupolygon', 'shape', 1);
+
+-- INSERT INTO views_geometry_columns_auth (view_name, view_geometry, hidden) 
+-- VALUES ('view_ecosite', 'shape', 0);
+
+-- register new view to a geopackage database
+INSERT INTO gpkg_contents( table_name, data_type, identifier, description ) 
+VALUES ('view_ecosite', 'features', 'View Ecosites', 'Ecological Site Name for dominant condition');
+

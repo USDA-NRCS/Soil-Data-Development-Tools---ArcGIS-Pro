@@ -1,0 +1,67 @@
+-- Transfer metadata table contents from an attached database (03/17/2021) to the current database
+-- Attached database will use an alias of 'MD'
+
+-- 1
+-- mdstattabs      75
+INSERT INTO main.mdstattabs(tabphyname, tablogname, tablabel, tabdesc, iefilename)
+SELECT X.tabphyname, X.tablogname, X.tablabel, X.tabdesc, X.iefilename, X.daglevel
+FROM MD.mdstattabs AS X
+;
+
+-- 2
+-- mdstatrshipmas  63
+INSERT INTO main.mdstatrshipmas(ltabphyname, rtabphyname, relationshipname, cardinality, mandatory)
+SELECT X.ltabphyname, X.rtabphyname, X.relationshipname, X.cardinality, X.mandatory
+FROM MD.mdstatrshipmas AS X
+;
+
+-- 3
+-- mdstatidxmas   149 (without spatial tables)
+INSERT INTO main.mdstatidxmas(tabphyname,idxphyname,uniqueindex)
+SELECT X.tabphyname, X.idxphyname, X.uniqueindex
+FROM MD.mdstatidxmas AS X
+;
+
+-- 4
+-- mdstatdommas   123
+INSERT INTO main.mdstatdommas( domainname, domainmaxlen)
+SELECT X.domainname, X.domainmaxlen
+FROM MD.mdstatdommas AS X
+;
+
+-- 5
+-- mdstattabcols  865 (without spatial tables)
+INSERT INTO main.mdstattabcols(tabphyname, colsequence, colphyname, collogname, collabel, logicaldatatype, notnull_, fieldsize, precision, minimum, maximum, uom, domainname, coldesc)
+SELECT X.tabphyname, X.colsequence, X.colphyname, X.collogname, X.collabel, X.logicaldatatype, X.notnull, X.fieldsize, X.precision, X.minimum, X.maximum, X.uom, X.domainname, X.coldesc
+FROM MD.mdstattabcols AS X
+;
+
+-- 6
+-- mdstatrshipdet  66
+INSERT INTO main.mdstatrshipdet(ltabphyname, rtabphyname, relationshipname, ltabcolphyname, rtabcolphyname)
+SELECT X.ltabphyname, X.rtabphyname, X.relationshipname, X.ltabcolphyname, X.rtabcolphyname
+FROM MD.mdstatrshipdet AS X
+;
+
+-- 7
+-- mdstatidxdet   172
+INSERT INTO main.mdstatidxdet(tabphyname,idxphyname,idxcolsequence,colphyname)
+SELECT X.tabphyname, X.idxphyname, X.idxcolsequence, X.colphyname
+FROM MD.mdstatidxdet AS X
+;
+
+-- 8
+-- mdstatdomdet 6930 
+INSERT INTO main.mdstatdomdet (domainname, choicesequence, choice, choicedesc, choiceobsolete)
+SELECT X.domainname, X.choicesequence, X.choice, X.choicedesc, X.choiceobsolete 
+FROM MD.mdstatdomdet AS X
+;
+
+-- 9
+-- system_templatedatabaseinformation 18
+INSERT INTO main.system_templatedatabaseinformation(Item_Name, Item_Sequence, Item_Value, Item_Narrative)
+SELECT X.Item_Name, X.Item_Sequence, X.Item_Value, X.Item_Narrative
+FROM MD.system_templatedatabaseinformation AS X
+;
+
+

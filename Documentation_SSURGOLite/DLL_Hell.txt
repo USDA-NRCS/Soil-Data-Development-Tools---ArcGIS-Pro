@@ -1,0 +1,26 @@
+
+PROGRAM FILES
+------------------------------------------------------------------------------------
+C:\Program Files\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\Library\bin\sqlite3.dll
+C:\Program Files\ArcGIS\Pro\bin\Python\envs\SQLite1\Library\bin\sqlite3.dll
+C:\Program Files\Box\Box\sqlite3.dll
+C:\Program Files\Common Files\Apple\Apple Application Support\SQLite3.dll
+C:\Program Files\DB Browser for SQLite\sqlite3.dll
+
+PROGRAM FILES (x86)
+------------------------------------------------------------------------------------
+C:\Program Files (x86)\Common Files\Apple\Apple Application Support\SQLite3.dll
+C:\Program Files (x86)\Esri\Data Interoperability (x86)\fmepython27\DLLs\sqlite3.dll
+C:\Program Files (x86)\Esri\Data Interoperability (x86)\plugins\sqlite3.dll
+C:\Program Files (x86)\Esri\Data Interoperability (x86)\plugins\geoconcept\sqlite3.dll
+C:\Program Files (x86)\GitHub\JEEENNZM.3RJ\NVLV566O.L98\gith..tion_317444273a93ac29_0003.0003_7e2bed3b892a9f28\sqlite3.dll
+C:\Program Files (x86)\PYTHON27\ArcGIS10.8\DLLs\sqlite3.dll
+C:\Program Files (x86)\PYTHON27\ArcGISx6410.8\DLLs\sqlite3.dll
+C:\Program Files (x86)\Sennheiser\SenncomSDK_ForVXME\CertUtil\sqlite3.dll
+
+
+REPLACEMENTS
+------------------------------------------------------------------------------------
+E:\Geodata_E\Spatialite_Binaries\sqlite3_64\sqlite3.dll
+
+E:\Geodata_E\Spatialite_Binaries\sqlite3_32\sqlite3.dll

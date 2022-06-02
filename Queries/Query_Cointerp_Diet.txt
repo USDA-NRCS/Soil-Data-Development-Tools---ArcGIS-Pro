@@ -1,0 +1,100 @@
+-- Full cointerp table
+-- Standard indexes on cokey fk, mrulename, ruledepth
+CREATE TABLE cointerp(
+cokey INTEGER NOT NULL,
+mrulekey INTEGER NOT NULL,
+mrulename CHARACTER(60) NOT NULL,
+seqnum INTEGER NOT NULL,
+rulekey INTEGER NOT NULL,
+rulename CHARACTER(60) NOT NULL,
+ruledepth INTEGER NOT NULL,
+interpll REAL,
+interpllc CHARACTER(254),
+interplr REAL,
+interplrc CHARACTER(254),
+interphr REAL,
+interphrc CHARACTER(254),
+interphh REAL,
+interphhc CHARACTER(254),
+nullpropdatabool CHARACTER(3),
+defpropdatabool CHARACTER(3),
+incpropdatabool CHARACTER(3),
+cointerpkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+) ;
+
+-- 1. Reduced to representative values cointerp table
+-- Standard indexes on cokey fk, mrulename, ruledepth
+CREATE TABLE cointerp(
+cokey INTEGER NOT NULL,
+mrulekey INTEGER NOT NULL,
+mrulename CHARACTER(60) NOT NULL,
+seqnum INTEGER NOT NULL,
+rulekey INTEGER NOT NULL,
+rulename CHARACTER(60) NOT NULL,
+ruledepth INTEGER NOT NULL,
+interphr REAL,
+interphrc CHARACTER(254),
+nullpropdatabool CHARACTER(3),
+defpropdatabool CHARACTER(3),
+incpropdatabool CHARACTER(3),
+cointerpkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+) ;
+
+CREATE INDEX DI_cointerp_3627 ON cointerp(cokey);
+CREATE INDEX DI_cointerp_7729 ON cointerp(mrulename);
+CREATE INDEX DI_cointerp_7730 ON cointerp(ruledepth);
+--
+
+
+-- 2. Reduced by removing mrulename
+-- Non-standard indexes on cokey fk, mrulekey, ruledepth
+CREATE TABLE cointerp(
+cokey INTEGER NOT NULL,
+mrulekey INTEGER NOT NULL,
+seqnum INTEGER NOT NULL,
+rulekey INTEGER NOT NULL,
+rulename CHARACTER(60) NOT NULL,
+ruledepth INTEGER NOT NULL,
+interphr REAL,
+interphrc CHARACTER(254),
+nullpropdatabool CHARACTER(3),
+defpropdatabool CHARACTER(3),
+incpropdatabool CHARACTER(3),
+cointerpkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+) ;
+
+CREATE INDEX DI_cointerp_3627 ON cointerp(cokey);
+CREATE INDEX DI_cointerp_7731 ON cointerp(mrulekey);
+CREATE INDEX DI_cointerp_7733 ON cointerp(rulekey);
+CREATE INDEX DI_cointerp_7730 ON cointerp(ruledepth);
+
+
+-- 3. Reduced by removing mrulename, rulekey, rulename, ruledepth and booleans
+-- Non-standard indexes on cokey fk, mrulekey
+CREATE TABLE cointerp(
+cokey INTEGER NOT NULL,
+mrulekey INTEGER NOT NULL,
+interphr REAL,
+interphrc CHARACTER(254),
+cointerpkey INTEGER NOT NULL PRIMARY KEY,
+FOREIGN KEY (cokey) REFERENCES component(cokey)
+) ;
+
+CREATE INDEX DI_cointerp_3627 ON cointerp(cokey);
+CREATE INDEX DI_cointerp_7731 ON cointerp(mrulekey);
+
+
+
+-- standard indexes
+CREATE INDEX DI_cointerp_3627 ON cointerp(cokey);
+CREATE INDEX DI_cointerp_7729 ON cointerp(mrulename);
+CREATE INDEX DI_cointerp_7730 ON cointerp(ruledepth);
+
+-- alternate indexes
+CREATE INDEX DI_cointerp_7731 ON cointerp(mrulekey);
+
+-- alternate indexes
+CREATE INDEX DI_cointerp_7733 ON cointerp(rulekey);

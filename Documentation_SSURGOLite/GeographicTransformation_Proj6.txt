@@ -1,0 +1,32 @@
+
+From PROJ database:
+
+SELECT auth_name, code, name, description, source_crs_code, target_crs_code, accuracy, tx AS x, ty AS y, tz AS z, rx, ry, rz, scale_difference
+FROM helmert_transformation
+WHERE auth_name = 'ESRI' AND code = 108190;
+
+
+4326 GRS80
+
+ESRI		auth_name
+108190		code
+WGS_1984_(ITRF00)_To_NAD_1983
+4326		source_crs_code
+4269		target_crs_code
+0.1		accuracy
+
+dx=0.9956
+dy=-1.9013
+dz=-0.5215
+rx=0.025915
+ry=0.009426
+rz=0.011599
+ds=0.00062
+
+--------------------------------------
+proj=pipeline
+step proj=cart ellps=GRS80
+step proj=helmert convention=coordinate_frame
+     x=-81.0703  y=-89.3603  z=-115.7526
+    rx=-0.48488 ry=-0.02436 rz=-0.41321  s=-0.540645
+step proj=cart inv ellps=GRS80

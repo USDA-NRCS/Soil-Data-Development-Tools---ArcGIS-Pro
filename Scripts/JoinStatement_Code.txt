@@ -1,0 +1,95 @@
+
+        # This is the original code that created the big flat table from areasymbol to rating field
+        #
+        joinStatements = list()
+
+        for i in range(len(tblList) - 1):
+
+            try:
+                tbl_1 = str(tblList[i])
+                alias_1 = str(dAlias[tbl_1])
+                pKey = str(tblKeys[tbl_1][0])
+                dPK[pKey] = alias_1 # save alias for parent key of each table in the list
+                tbl_2 = str(tblList[(1 + i)])
+                alias_2 = str(dAlias[tbl_2])
+                fKey = str(tblKeys[tbl_2][1])
+                sqlClause = str(dSDV["sqlwhereclause"])
+
+                if tbl_2 == attributeTable:
+                    # this is the attribute table with the rating value
+                    if not sqlClause in ["None", ""] :
+
+                        # Need to fix an issue with the way I'm handling the 'Percent Present' aggregation method in
+                        # combination with the sdvattribute.sqlwhereclause. The following works but it's a kludge.
+                        if aggMethod != "Percent Present":
+                            PrintMsg(" \nHere's where I am adding the 'sqlwhereclause' from the sdvattribute table", 1)
+                            
+                            sql = "LEFT OUTER JOIN " + tbl_2 + " " + alias_2 + " ON " + \
+                                  alias_1 + "." + pKey + " = " + alias_2 + "." + fKey + " AND " + sqlClause + " \n"
+
+                        else:
+                            PrintMsg(" \nHere's where I am skipping the 'sqlwhereclause' from the sdvattribute table", 1)
+                            sql = "LEFT OUTER JOIN " + tbl_2 + " " + alias_2 + " ON " + \
+                                  alias_1 + "." + pKey + " = " + alias_2 + "." + fKey + " \n"
+                        
+                        joinStatements.append("\n" + sql)
+
+                    else:
+                        sql = "\nLEFT OUTER JOIN " + tbl_2 + " " + alias_2 + " ON " + alias_1 + "." + pKey + " = " + alias_2 + "." + fKey + " \n"
+                        joinStatements.append(sql)
+                        
+                else:
+                    # this is one of the upper level support tables
+                    if tbl_1 == "legend":
+                        sql = "\nINNER JOIN " + tbl_2 + " " + alias_2 + " ON " + alias_1 + "." + pKey + " = " + alias_2 + "." + fKey + " \n"
+                        joinStatements.append(sql)
+
+                    else:
+                        sql = "\nLEFT OUTER JOIN " + tbl_2 + " " + alias_2 + " ON " + alias_1 + "." + pKey + " = " + alias_2 + "." + fKey + " \n"
+                        joinStatements.append(sql)
+                    
+            except:
+                errorMsg()
+                break
+
+        selectFields = list()
+        
+        for eachFld in allFields:
+            if eachFld in dPK:
+
+                if not eachFld == "lkey":
+                    selectFields.append(dPK[eachFld] + "." + eachFld )
+
+            else:
+                selectFields.append(eachFld)
+
+        # Assemble the final query for the 'sdv_data' table in SQLite.
+        # Question, do I need to apply the sqlClause here, or in the aggregation steps?
+        # Leaving it out at this point will leave all data in the 'sdv_data' table.
+        #
+        sql_1 = ", ".join(selectFields[0:(len(selectFields) -1)])
+        sql_2 = ", " + selectFields[-1]  # rating field
+
+        finalQuery = "SELECT " + sql_1 + sql_2 + "\nFROM legend AS " + dAlias["legend"] + "\n" + "".join(joinStatements) 
+
+        queryList = [q for q in [coQuery, moQuery, interpQuery, hzQuery, conQuery, wcQuery] if q != ""]
+        queryCnt = 0
+
+        if len(queryList) > 0:
+            finalQuery += "WHERE "
+            
+            for i, q in enumerate(queryList):
+                #PrintMsg(str(i) + ". " + q, 1)
+
+                if i > 0:
+                    finalQuery += " AND " + q
+
+                else:
+                    finalQuery += q
+        
+        finalQuery += " ;"
+
+        PrintMsg(" \nQuery used to generate data for the 'sdv_data' table: \n ", 0)
+        PrintMsg(finalQuery + " \n ", 0)
+        #
+        # This is the end of the original code that created the big flat table from areasymbol to rating field

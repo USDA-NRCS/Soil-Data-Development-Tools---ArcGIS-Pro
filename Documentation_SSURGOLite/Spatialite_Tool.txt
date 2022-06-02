@@ -1,0 +1,146 @@
+# Please Note!
+#
+# My initial tests ran these spatialite_tool commands from an elevated DOS command line
+#
+
+usage: spatitalite_tool CMD ARGLIST
+==============================================================
+CMD has to be one of the followings:
+------------------------------------
+-h or --help                      print this help message
+-v or --version                   print version infos
+-i or --import                    import [CSV/TXT, DBF or SHP]
+-e or --export-shp                exporting some shapefile
+
+supported ARGs are:
+-------------------
+-dbf or --dbf-path pathname       the full DBF path
+-shp or --shapefile pathname      the shapefile path [NO SUFFIX]
+-d or --db-path pathname          the SpatiaLite db path
+-t or --table table_name          the db geotable
+-g or --geometry-column col_name  the Geometry column
+-c or --charset charset_name      a charset name
+-s or --srid SRID                 the SRID
+--type         [POINT | LINESTRING | POLYGON | MULTIPOINT]
+
+optional ARGs for SHP import are:
+---------------------------------
+-2 or --coerce-2d                  coerce to 2D geoms [x,y]
+-k or --compressed                 apply geometry compression
+
+examples:
+---------
+spatialite_tool -i -dbf abc.dbf -d db.sqlite -t tbl -c CP1252
+spatialite_tool -i -shp abc -d db.sqlite -t tbl -c CP1252 [-s 4326] [-g geom]
+spatialite_tool -i -shp abc -d db.sqlite -t tbl -c CP1252 [-s 4326] [-2] [-k]
+spatialite_tool -e -shp abc -d db.sqlite -t tbl -g geom -c CP1252 [--type POINT]
+
+# This spatialite tool command will create and register a new featureclass in spatialite db that uses pk_uid for FID. shape is last column:
+# Using C:\Program Files\Utilities\spatialite-tools-5.0.0-win-amd64>\spatialite_tool.exe
+
+C:\Program Files\Utilities\spatialite-tools-5.0.0-win-amd64\spatialite_tool.exe -i -shp D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157 -d D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite19.sqlite -t xx_mupolygon -g shape -s 4326 -c CP1252 --type POLYGON 
+
+
+# Next using DB Browser, copy data from mupolygon2 to mupolygon (mod_spatialite extension must be loaded).
+#
+# There is an issue in that shapefile is POLYGON and mupolygon is MULTIPOLYGON
+INSERT INTO mupolygon (shape, areasymbol, spatialver, musym, mukey) 
+SELECT CastToMultiPolygon(shape) AS shape, areasymbol, spatialver, musym, mukey
+FROM xx_mupolygon
+;
+
+
+
+Partial success:
+Start Time: Saturday, June 26, 2021 7:48:25 AM
+.	Extensions folder: C:\Program Files\DB Browser for SQLite
+.	Creating list of shapefiles to be imported for each survey area...
+Creating new database: D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite49.sqlite
+.	Creating new database connection...
+.	Turning OFF foreign key constraints...
+.	Increasing database cache size...
+.
+Setting cache size for indexing performance...
+.	Dropping attribute indexes from new database...
+.
+.	Importing tabular data using function 'ImportTabularSQL2'...
+.	Excluding 6 deprecated cointerp columns
+.	Finally closing database
+All tabular data imported
+.	Using new function: AppendFeatures_Spatialite
+.	Got database connection...
+.	Spatialite Security setting: relaxed
+.	Loading extension: spatialite400x
+.	Got extension...
+.	Shapefile fields:	shape, areasymbol, spatialver, musym, mukey
+.	Featureclass fields:	shape, areasymbol, spatialver, musym, mukey
+.
+.
+Appending 1 map unit polygon shapefiles to create new featureclass: mupolygon
+.	Processing D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157.shp...
+.
+.
+C:\Program Files\Utilities\spatialite-tools-5.0.0-win-amd64\spatialite_tool.exe -i -shp D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157 -d D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite49.sqlite -t xx_mupolygon -g shape -s 4326 -c CP1252 --type POLYGON
+.
+.	Appending shapefile no. 1  (soilmu_a_mo157.shp)
+.
+.	Got shapefile data
+.
+.
+.	Skipping INSERT...
+.	Current end of 'for shpFile' iteration
+.	Process complete for this function...
+.	Finally closing database
+.	Finally closing shapefile driver
+.	Registering spatial layers to the database
+.
+All tabular and spatial data have been imported...
+.
+Restoring previously existing attribute indexes for the new database...
+.
+Compacting new database...
+.	Database size before:	49 MB
+.	Free temp space: 151,218 MB
+.	Minimum free disk space required: 98 MB
+.	Database size after:	47 MB
+.	Finished compacting database...
+.
+Output database:  D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite75.sqlite
+Succeeded at Saturday, June 26, 2021 7:49:58 AM (Elapsed Time: 1 minutes 32 seconds)
+
+
+spatialite commandline
+-----------------------------------------------------------------------------------------------
+
+"C:\Program Files\Utilities\spatialite-tools-5.0.0-win-amd64\spatialite.exe" -silent "D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite75.sqlite" "INSERT INTO mupolygon (shape, areasymbol, spatialver, musym, mukey) SELECT CastToMultiPolygon(shape) AS shape, areasymbol, spatialver, musym, mukey FROM xx_mupolygon ;"
+
+
+"C:\Program Files\Utilities\spatialite-tools-5.0.0-win-amd64\spatialite_tool.exe" -i -shp "D:\Geodata\2021\SSURGO_Downloads\soil_mo157\spatial\soilmu_a_mo157" -d "D:\Geodata\2021\SQLite_Tests\OutputDatabases2\append_spatialite81.sqlite" -t xx_mupolygon -g shape -s 4326 -c CP1252 --type POLYGON
+.
+
+
+
+C:\Program Files\Utilities\spatialite-tools-5.0.0-win-amd64>spatialite -help
+Usage: spatialite [OPTIONS] FILENAME [SQL]
+FILENAME is the name of an SQLite database. A new database is created
+if the file does not previously exist.
+OPTIONS include:
+   -bail                stop after hitting an error
+   -batch               force batch I/O
+   -column              set output mode to 'column'
+   -cmd command         run "command" before reading stdin
+   -csv                 set output mode to 'csv'
+   -echo                print commands before execution
+   -init filename       read/process named file
+   -[no]header          turn headers on or off
+   -help                show this message
+   -html                set output mode to HTML
+   -interactive         force interactive I/O
+   -line                set output mode to 'line'
+   -list                set output mode to 'list'
+   -silent              suppress the welcome message
+   -nullvalue 'text'    set text string for NULL values
+   -separator 'x'       set output field separator (|)
+   -stats               print memory stats before each finalize
+   -version             show SQLite version
+   -vfs NAME            use NAME as the default VFS

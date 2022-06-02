@@ -1,0 +1,29 @@
+SSURGO data model changes
+---------------------------------------------------------
+mdstattabcols should include physicaldatatype column? Use MS Access datatypes for SSURGO and SQLite for SSURGO-lite?
+
+mstattabs contains spatial tables and the mdstattabcols table has attribute columns listed,  
+
+but does not list primary key or geometry column.
+
+The spatial tables are not included in the metadata for relationships or indexes (neither attribute nor spatial).
+
+Not sure if the spatial tables need to participate in constraints or triggers.
+
+Consider adding indexes for cointerp.rulekey and cointerp.mrulekey
+
+Mechanism for updating or editing these SSURGO-lite databases?
+
+Potential problems with some keyword violations:
+	month
+	notnull
+	precision
+	some mixed-case table names
+	spaces in MS Access tables ('SYSTEM *). Not sure if we plan to retain these tables.
+	Some of the prepopulated SYSTEM tables are out-of-date.
+		SYSTEM - Template Database Information
+		
+
+
+
+

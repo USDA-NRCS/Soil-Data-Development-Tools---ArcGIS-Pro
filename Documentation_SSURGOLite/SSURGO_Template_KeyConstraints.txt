@@ -1,0 +1,152 @@
+chaashto: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chaashto: Primary Key (chaashtokey) 
+chconsistence: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chconsistence: Primary Key (chconsistkey) 
+chdesgnsuffix: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chdesgnsuffix: Primary Key (chdesgnsfxkey) 
+chfrags: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chfrags: Primary Key (chfragskey) 
+chorizon: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+chorizon: Primary Key (chkey) 
+chpores: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chpores: Primary Key (chporeskey) 
+chstruct: Foreign Key (chstructgrpkey) REFERENCES chstructgrp(chstructgrpkey) ON DELETE CASCADE
+chstruct: Primary Key (chstructkey) 
+chstructgrp: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chstructgrp: Primary Key (chstructgrpkey) 
+chtext: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chtext: Primary Key (chtextkey) 
+chtexture: Foreign Key (chtgkey) REFERENCES chtexturegrp(chtgkey) ON DELETE CASCADE
+chtexture: Primary Key (chtkey) 
+chtexturegrp: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chtexturegrp: Primary Key (chtgkey) 
+chtexturemod: Foreign Key (chtkey) REFERENCES chtexture(chtkey) ON DELETE CASCADE
+chtexturemod: Primary Key (chtexmodkey) 
+chunified: Foreign Key (chkey) REFERENCES chorizon(chkey) ON DELETE CASCADE
+chunified: Primary Key (chunifiedkey) 
+cocanopycover: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cocanopycover: Primary Key (cocanopycovkey) 
+cocropyld: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cocropyld: Primary Key (cocropyldkey) 
+codiagfeatures: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+codiagfeatures: Primary Key (codiagfeatkey) 
+coecoclass: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+coecoclass: Primary Key (coecoclasskey) 
+coeplants: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+coeplants: Primary Key (coeplantskey) 
+coerosionacc: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+coerosionacc: Primary Key (coeroacckey) 
+coforprod: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+coforprod: Primary Key (cofprodkey) 
+coforprodo: Foreign Key (cofprodkey) REFERENCES coforprod(cofprodkey) ON DELETE CASCADE
+coforprodo: Primary Key (cofprodokey) 
+cogeomordesc: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cogeomordesc: Primary Key (cogeomdkey) 
+cohydriccriteria: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cohydriccriteria: Primary Key (cohydcritkey) 
+cointerp: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cointerp: Primary Key (cointerpkey) 
+comonth: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+comonth: Primary Key (comonthkey) 
+component: Foreign Key (mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE
+component: Primary Key (cokey) 
+copm: Foreign Key (copmgrpkey) REFERENCES copmgrp(copmgrpkey) ON DELETE CASCADE
+copm: Primary Key (copmkey) 
+copmgrp: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+copmgrp: Primary Key (copmgrpkey) 
+copwindbreak: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+copwindbreak: Primary Key (copwindbreakkey) 
+corestrictions: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+corestrictions: Primary Key (corestrictkey) 
+cosoilmoist: Foreign Key (comonthkey) REFERENCES comonth(comonthkey) ON DELETE CASCADE
+cosoilmoist: Primary Key (cosoilmoistkey) 
+cosoiltemp: Foreign Key (comonthkey) REFERENCES comonth(comonthkey) ON DELETE CASCADE
+cosoiltemp: Primary Key (cosoiltempkey) 
+cosurffrags: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cosurffrags: Primary Key (cosurffragskey) 
+cosurfmorphgc: Foreign Key (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey) ON DELETE CASCADE
+cosurfmorphgc: Primary Key (cosurfmorgckey) 
+cosurfmorphhpp: Foreign Key (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey) ON DELETE CASCADE
+cosurfmorphhpp: Primary Key (cosurfmorhppkey) 
+cosurfmorphmr: Foreign Key (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey) ON DELETE CASCADE
+cosurfmorphmr: Primary Key (cosurfmormrkey) 
+cosurfmorphss: Foreign Key (cogeomdkey) REFERENCES cogeomordesc(cogeomdkey) ON DELETE CASCADE
+cosurfmorphss: Primary Key (cosurfmorsskey) 
+cotaxfmmin: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cotaxfmmin: Primary Key (cotaxfmminkey) 
+cotaxmoistcl: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cotaxmoistcl: Primary Key (cotaxmckey) 
+cotext: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cotext: Primary Key (cotextkey) 
+cotreestomng: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cotreestomng: Primary Key (cotreestomngkey) 
+cotxfmother: Foreign Key (cokey) REFERENCES component(cokey) ON DELETE CASCADE
+cotxfmother: Primary Key (cotaxfokey) 
+distinterpmd: Foreign Key (distmdkey) REFERENCES distmd(distmdkey) ON DELETE CASCADE
+distinterpmd: Primary Key (distinterpmdkey) 
+distlegendmd: Foreign Key (distmdkey) REFERENCES distmd(distmdkey) ON DELETE CASCADE
+distlegendmd: Primary Key (distlegendmdkey) 
+distmd: Primary Key (distmdkey) 
+featdesc: Primary Key (featkey) 
+featdesc Unique Key (areasymbol, featsym) 
+laoverlap: Foreign Key (lkey) REFERENCES legend(lkey) ON DELETE CASCADE
+laoverlap: Primary Key (lareaovkey) 
+legend: Primary Key (lkey) 
+legendtext: Foreign Key (lkey) REFERENCES legend(lkey) ON DELETE CASCADE
+legendtext: Primary Key (legtextkey) 
+mapunit: Foreign Key (lkey) REFERENCES legend(lkey) ON DELETE CASCADE
+mapunit: Primary Key (mukey) 
+mdstatdomdet: Foreign Key (domainname) REFERENCES mdstatdommas(domainname) ON DELETE CASCADE
+mdstatdomdet: Primary Key (domainname, choicesequence) 
+mdstatdomdet Unique Key (domainname, choice) 
+mdstatdommas: Primary Key (domainname) 
+mdstatidxdet: Foreign Key (tabphyname, idxphyname) REFERENCES mdstatidxmas(tabphyname, idxphyname) ON DELETE CASCADE
+mdstatidxdet: Primary Key (tabphyname, idxphyname, idxcolsequence) 
+mdstatidxdet Unique Key (tabphyname, idxphyname, colphyname) 
+mdstatidxmas: Foreign Key (tabphyname) REFERENCES mdstattabs(tabphyname) ON DELETE CASCADE
+mdstatidxmas: Primary Key (tabphyname, idxphyname) 
+mdstatrshipdet: Foreign Key (ltabphyname, rtabphyname, relationshipname) REFERENCES mdstatrshipmas(ltabphyname, rtabphyname, relationshipname) ON DELETE CASCADE
+mdstatrshipdet: Foreign Key (ltabphyname, ltabcolphyname) REFERENCES mdstattabcols(tabphyname, colphyname) ON DELETE CASCADE
+mdstatrshipdet: Foreign Key (rtabphyname, rtabcolphyname) REFERENCES mdstattabcols(tabphyname, colphyname) ON DELETE CASCADE
+mdstatrshipdet: Primary Key (ltabphyname, rtabphyname, relationshipname, ltabcolphyname, rtabcolphyname) 
+mdstatrshipmas: Foreign Key (ltabphyname) REFERENCES mdstattabs(tabphyname) ON DELETE CASCADE
+mdstatrshipmas: Foreign Key (rtabphyname) REFERENCES mdstattabs(tabphyname) ON DELETE CASCADE
+mdstatrshipmas: Primary Key (ltabphyname, rtabphyname, relationshipname) 
+mdstattabcols: Foreign Key (domainname) REFERENCES mdstatdommas(domainname) ON DELETE CASCADE
+mdstattabcols: Foreign Key (domainname) REFERENCES mdstatdommas(domainname) ON DELETE CASCADE
+mdstattabcols: Foreign Key (tabphyname) REFERENCES mdstattabs(tabphyname) ON DELETE CASCADE
+mdstattabcols: Foreign Key (tabphyname) REFERENCES mdstattabs(tabphyname) ON DELETE CASCADE
+mdstattabcols: Primary Key (tabphyname, colsequence) 
+mdstattabcols Unique Key (tabphyname, colphyname) 
+mdstattabcols Unique Key (tabphyname, collogname) 
+mdstattabcols Unique Key (tabphyname, collabel) 
+mdstattabs: Primary Key (tabphyname) 
+mdstattabs Unique Key (tablogname) 
+mdstattabs Unique Key (tablabel) 
+mdstattabs Unique Key (iefilename) 
+month Unique Key (monthseq) 
+month: Primary Key (monthname) 
+muaggatt: Foreign Key (mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE
+muaggatt: Primary Key (mukey) 
+muaoverlap: Foreign Key (lareaovkey) REFERENCES laoverlap(lareaovkey) ON DELETE CASCADE
+muaoverlap: Foreign Key (mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE
+muaoverlap: Primary Key (muareaovkey) 
+mucropyld: Foreign Key (mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE
+mucropyld: Primary Key (mucrpyldkey) 
+mutext: Foreign Key (mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE
+mutext: Primary Key (mutextkey) 
+sacatalog: Primary Key (sacatalogkey) 
+sacatalog Unique Key (areasymbol) 
+sainterp: Foreign Key (sacatalogkey) REFERENCES sacatalog(sacatalogkey) ON DELETE CASCADE
+sainterp: Primary Key (sainterpkey) 
+sainterp Unique Key (areasymbol, interpname) 
+sdvalgorithm Unique Key (algorithmsequence) 
+sdvalgorithm Unique Key (algorithminitials) 
+sdvalgorithm: Primary Key (algorithmname) 
+sdvattribute Unique Key (attributename) 
+sdvattribute: Primary Key (attributekey) 
+sdvattribute: Foreign Key (algorithmname) REFERENCES sdvalgorithm(algorithmname) ON DELETE CASCADE
+sdvfolder: Primary Key (folderkey) 
+sdvfolderattribute: Foreign Key (attributekey) REFERENCES sdvattribute(attributekey) ON DELETE CASCADE
+sdvfolderattribute: Primary Key (folderkey, attributekey) 
+sdvfolderattribute: Foreign Key (folderkey) REFERENCES sdvfolder(folderkey) ON DELETE CASCADE

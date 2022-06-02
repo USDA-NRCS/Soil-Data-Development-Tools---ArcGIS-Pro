@@ -1,0 +1,105 @@
+Possible method for creating spatial tables in SSURGO-Lite database (.sqlite)
+
+1. First option is to run sqlite3 commands in QGIS Python Window. 
+   Please note, DB Browser seems to have problems with mod_spatialite. 
+
+2. Run the "SELECT load_extension('mod_spatialite')" command in DB Browser. 
+
+3. Create empty spatial tables that include the 'shape' column. Important Note! I am using a database
+   which has already had the spatial metadata tables and attribute tables created. 
+   If this is a new database, use  SELECT InitSpatialMetaData(); (Note! got back a failed zero in DB Browser on work laptop)
+   The spatialite_gui automatically does this for you when used to create a 
+   new database. I think QGIS and ArcGIS will also, but not sure if they all do it the same way.
+
+----------------------------------------------------------------------------
+CREATE TABLE featline (
+objectid INTEGER NOT NULL,
+shape LINESTRING,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+featsym TEXT(3),
+featkey INTEGER,
+PRIMARY KEY(objectid AUTOINCREMENT),
+FOREIGN KEY(featkey) REFERENCES featdesc(featkey) ON DELETE CASCADE,
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+
+CREATE TABLE featpoint (
+objectid INTEGER NOT NULL,
+shape POINT,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+featsym TEXT(3),
+featkey INTEGER,
+PRIMARY KEY(objectid AUTOINCREMENT),
+FOREIGN KEY(featkey) REFERENCES featdesc(featkey) ON DELETE CASCADE,
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+
+CREATE TABLE muline (
+objectid INTEGER NOT NULL,
+shape LINESTRING,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+musym TEXT(6),
+mukey INTEGER,
+PRIMARY KEY(objectid AUTOINCREMENT),
+FOREIGN KEY(mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE,
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+
+CREATE TABLE mupoint (
+objectid INTEGER NOT NULL,
+mupoint POINT,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+musym TEXT(6),
+mukey INTEGER,
+FOREIGN KEY(mukey) REFERENCES mapunit(mukey),
+PRIMARY KEY(objectid AUTOINCREMENT)
+FOREIGN KEY(mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE,
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+
+CREATE TABLE mupolygon (
+objectid INTEGER NOT NULL,
+shape MULTIPOLYGON,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+musym TEXT(6),
+mukey INTEGER NOT NULL,
+PRIMARY KEY(objectid AUTOINCREMENT),
+FOREIGN KEY(mukey) REFERENCES mapunit(mukey) ON DELETE CASCADE,
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+
+CREATE TABLE sapolygon (
+objectid INTEGER NOT NULL,
+shape MULTIPOLYGON,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+lkey INTEGER,
+PRIMARY KEY(objectid AUTOINCREMENT),
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+----------------------------------------------------------------------------
+
+4. May need to use the conn.enable_extensions command first. Confirmed. 
+   Tricky part is identifying and properly referencing the correct spatialite DLL. 
+   Difference between 32 and 64-bit DLLs. Make sure to use the correct one for the user's environment.
+
+
+
+5. Open a sqlite3 connection to the database from the Python window. Alternative to test is DB Browser SQL window.
+
+6. Two or three types of sql statements will be needed:
+	a. SELECT AddGeometryColumn('featline', 'shape', 4326, 'LINESTRING', 2); #returns 0 (don't know why)
+	b. SELECT RecoverGeometryColumn('featline', 'shape', 4326, 'LINESTRING', 2); #should return 1
+	c. Not sure about spatial index, but possible: SELECT CreateSpatialIndex('featline', 'shape');
+	d. Seems like I may have had to run the RestoreGeometryColumn twice on some tables.
+        e. May have to disconnect and reconnect before the spatial enabling is evident.
+
+7. To remove a spatial table geometry and trigger references, use "SELECT DropGeoTable('featline');"
+
+
+

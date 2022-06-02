@@ -1,0 +1,4 @@
+-- Update one column using data from an attached database
+UPDATE mdstattabcols AS M
+SET coldesc =  ( SELECT coldesc FROM MD.mdstattabcols AS X WHERE M.tabphyname = X.tabphyname AND M.colphyname = X.colphyname)
+;

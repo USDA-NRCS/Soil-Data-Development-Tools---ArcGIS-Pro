@@ -1,0 +1,28 @@
+mupolygon indexes
+
+CREATE INDEX DI_mupolygon ON mupolygon(mukey);
+
+CREATE INDEX DI_mupolygon2 ON mupolygon(areasymbol);
+
+CREATE INDEX PK_mupolygon ON mupolygon(objectid);
+
+CREATE TABLE mupolygon (
+objectid INTEGER NOT NULL,
+shape MULTIPOLYGON,
+areasymbol TEXT(20),
+spatialver MEDIUMINT,
+musym TEXT(6),
+mukey INTEGER NOT NULL,
+PRIMARY KEY(objectid AUTOINCREMENT),
+CONSTRAINT fk_mupolygon1
+FOREIGN KEY(mukey) REFERENCES mapunit(mukey),
+CONSTRAINT fk_mupolygon2
+FOREIGN KEY(areasymbol) REFERENCES sacatalog(areasymbol) ON DELETE CASCADE
+);
+
+-- Try running RecoverGeometryColumn 2X in a row against an existing 'shape' column.
+SELECT RecoverGeometryColumn('mupolygon', 'shape', 4326, 'MULTIPOLYGON'
+
+SELECT CreateSpatialIndex('mupolygon', 'shape');
+
+

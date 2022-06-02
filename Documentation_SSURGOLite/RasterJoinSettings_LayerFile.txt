@@ -1,0 +1,25 @@
+
+
+        "joins" : {
+          "type" : "CIMRelQueryTableDataConnection",
+          "sourceTable" : {
+            "type" : "CIMStandardDataConnection",
+            "workspaceConnectionString" : "DATABASE=.",
+            "workspaceFactory" : "Shapefile",
+            "dataset" : "SoilRaster_tx_spatialindex01.tif.vat",
+            "datasetType" : "esriDTTable"
+          },
+          "destinationTable" : {
+            "type" : "CIMStandardDataConnection",
+            "workspaceConnectionString" : "AUTHENTICATION_MODE=OSA;DATABASE=.\\tx_spatialindex01.gpkg",
+            "workspaceFactory" : "Sql",
+            "dataset" : "main.sdv_Frmlndcls",
+            "datasetType" : "esriDTTable"
+          },
+          "primaryKey" : "mukey",
+          "foreignKey" : "mukey",
+          "name" : "GPAddJoin",
+          "cardinality" : "esriRelCardinalityOneToMany",
+          "joinType" : "esriLeftOuterJoin",
+          "joinForward" : false
+        }

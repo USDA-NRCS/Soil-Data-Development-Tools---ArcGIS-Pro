@@ -1,0 +1,10 @@
+Current list of Pro scripts as of 03-25-2021
+
+SSURGO_BatchDownload.py  * used for all three SSURGO Download tools
+
+Create_SQLiteDB_FromMetadata4.py - 'Create SQL Tabular Schema using SSURGO Metadata' tool
+
+ConvertShapefilesToSQLite.py -  'Create SQLite Spatial Schema Using Shapefiles' tool
+
+SSURGO_Convert_to_SQLiteDB3.py  - 'Import SSURGO Data into SSURGO-SQLite Template' tool
+

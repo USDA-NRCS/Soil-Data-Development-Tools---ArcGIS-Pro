@@ -1,0 +1,16 @@
+SELECT M.[IndexID]
+  ,[TablePhysicalName]
+  ,[ConstraintOrIndexName]
+  ,[ColumnPhysicalName]
+  ,[IndexColumnSequence] AS Sequence
+  ,[UniqueIndex]
+  ,(SELECT MT.[TablePhysicalName] FROM [MetadataTable] MT WHERE MT.TableID = LeftTableID) AS LeftTable
+  ,(SELECT MC.[ColumnPhysicalName] FROM [MetadataTableColumn] MC WHERE MC.ColumnID = LeftColumnID) AS LeftColumn
+FROM [MetadataIndexMaster] AS M
+LEFT OUTER JOIN [MetadataIndexDetail] AS D ON M.[IndexID] = D.[IndexID]
+LEFT OUTER JOIN [MetadataTable] AS T ON M.[TableID] = T.[TableID]
+LEFT OUTER JOIN [MetadataTableColumn] AS C ON D.[ColumnID] = C.[ColumnID]
+LEFT OUTER JOIN [MetadataRelationshipDetail] AS RD ON T.[TableID] = RD.[RightTableID] AND C.[ColumnID] = RD.[RightColumnID]
+WHERE [TablePhysicalName] IN ('mupolygon','muline','mupoint','featline', 'featpoint', 'sapolygon') AND LEFT(ConstraintOrIndexName, 3) LIKE 'DI_%'
+ORDER BY [TablePhysicalName], D.[IndexID], D.[TableColumnSequence], [IndexColumnSequence] ASC
+;

@@ -1,0 +1,51 @@
+SQLite Demo
+
+A. Types of sqlite databases
+	1. SQLite
+		a. Filename extension: .sqlite
+		b. Geometry
+			i.  stored as Spatialite
+			ii. stored as ST_Geometry
+		c. No raster capabilities
+
+	2. Geopackage
+		a. Filename extension: .gpkg
+		b. Capable of storing raster as but needs more testing
+
+	3. Mobile Geodatabase
+		a. Filename extension: .geodatabase
+		b. Hybrid ESRI geodatabase based upon SQLite
+		c. Relatively new and not 100% supported yet
+		d. Popups don't seem to work for spatial views
+		e. Don't seem to be able to store rasters within mobile geodatabase
+	4. Need to investigate compatibility of various database flavors within Survey123
+
+B. Soil Rasters: if we want to use SQLite to replace the MS Access database 
+   for soil data distribution, do we want to continue with the same data model as 
+   gSSURGO and gNATSGO, where the mukey-raster is part of the database?
+
+C. SSURGO-type metadata for content and database structure
+	1. Currently SSURGO has content metadata stored in the sacatalog table 
+           and externally in FGDC-CDSGM xml and text files.
+	2. gSSURGO and gNATSGO has a mix of very general content metadata and 
+           structural metadata. This information is stored in the GDB_Items table and is 
+           viewable through the ArcCatalog Description tab or Catalog Description pane.
+	3. What are metadata options for SQLite databases?
+	4. Mobile Geodatabase seems to be able to store metada in a similar manner 
+           to the file geodatabase.
+
+D. File sizes- it appears that the SQLite database is not a efficient at storing data, 
+compared to the file geodatabase. Needs more investigation.
+
+E. Integer or Text for primary and foreign keys?
+
+F. Tool development for creating soil maps and reports
+	1. Initial set of tools have been ported to ArcGIS Pro for experimental purposes
+		a. Download SSURGO By Map
+		b. Create SQL Tabular Schema using SSURGO Metadata
+		c. Create SQLite Spatial Schema using Shapefiles 
+                   (Needs SQL option development)
+		d. Import SSURGO Data into SSURGO-SQLite Template
+
+
+	

@@ -1,0 +1,34 @@
+db = "D:/Geodata/2021/SQLite_Tests/OutputDatabases2/ks_test03.sqlite"
+
+# Note! Must remove the '.shp' filename extension from the input shapefile.
+shpFile = "D:\Geodata\2021\SSURGO_Downloads\soil_ks003\spatial\soilsa_a_ks003"
+
+# Creates a virtual shapefile in the database. 
+# Altered field names for these FID --> pkuid; shape --> geometry. 
+# Please note! key values will be the original TEXT(30).
+# Not sure if this will cause a problem. May need to cast those values when inserting them into the empty tables.
+
+dbConn = sqlite3.connect(newDB)
+
+dbConn.enable_load_extension(True)
+
+extension = 'spatialite400.dll'
+
+sqlExtension = "SELECT load_extension('" + extension + "');"
+
+dbConn.execute(sqlExtension)
+
+
+liteCur = conn.cursor()
+
+sqlShape = """CREATE VIRTUAL TABLE vshape USING VirtualShape('D:/Geodata/2021/SSURGO_Downloads/soil_ks001/spatial/soilsa_a_ks001', 'UTF-8', 4326);"""
+
+liteCur.execute(sqlShape)
+
+dbConn.commit()
+
+# Copy data from vshape to appropriate SSURGO-Lite featureclass
+# ....
+# when copy is finished, commit inserts and then drop the virtual table vshape
+
+dbConn.commit()

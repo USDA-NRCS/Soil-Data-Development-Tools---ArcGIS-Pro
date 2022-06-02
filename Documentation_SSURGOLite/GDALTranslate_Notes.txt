@@ -1,0 +1,60 @@
+
+
+gdal.UseExceptions()
+
+
+rPath = r"D:\Geodata\2021\SQLite_Tests\OutputDatabases";
+inputRasterName = "main_PolygonToRaster.tif";
+inputRaster = os.path.join(rPath, inputRasterName);
+
+
+rOptions = gdal.TranslateOptions(outputType=gdalconst.GDT_UInt16, format="GTiff", xRes=0.0003, yRes=0.0003, outputSRS=4326)
+
+out_raster = gdal.Translate(outputRaster, ds, options=rOptions)  # (output ds, input ds
+
+# possible arguments: 
+
+outputType=gdalconst.GDT_UInt32,
+format="GTiff",
+xRes=0.0077,
+yRes=0.0077,
+outputSRS=4326,
+rat=1?
+
+Create a TranslateOptions() object that can be passed to gdal.Translate()
+Keyword arguments are :
+  options --- can be be an array of strings, a string or let empty and filled from other keywords.
+  format --- output format ("GTiff", etc...)
+  outputType --- output type (gdalconst.GDT_Byte, etc...)
+  bandList --- array of band numbers (index start at 1)
+  maskBand --- mask band to generate or not ("none", "auto", "mask", 1, ...)
+  width --- width of the output raster in pixel
+  height --- height of the output raster in pixel
+  widthPct --- width of the output raster in percentage (100 = original width)
+  heightPct --- height of the output raster in percentage (100 = original height)
+  xRes --- output horizontal resolution
+  yRes --- output vertical resolution
+  creationOptions --- list of creation options
+  srcWin --- subwindow in pixels to extract: [left_x, top_y, width, height]
+  projWin --- subwindow in projected coordinates to extract: [ulx, uly, lrx, lry]
+  projWinSRS --- SRS in which projWin is expressed
+  strict --- strict mode
+  unscale --- unscale values with scale and offset metadata
+  scaleParams --- list of scale parameters, each of the form [src_min,src_max] or [src_min,src_max,dst_min,dst_max]
+  exponents --- list of exponentiation parameters
+  outputBounds --- assigned output bounds: [ulx, uly, lrx, lry]
+  metadataOptions --- list of metadata options
+  outputSRS --- assigned output SRS
+  nogcp --- ignore GCP in the raster
+  GCPs --- list of GCPs
+  noData --- nodata value (or "none" to unset it)
+  rgbExpand --- Color palette expansion mode: "gray", "rgb", "rgba"
+  stats --- whether to calculate statistics
+  rat --- whether to write source RAT
+  resampleAlg --- resampling mode
+  callback --- callback method
+  callback_data --- user data for callback
+
+from osgeo import gdalconst
+dir(gdalconst)
+['CE_Debug', 'CE_Failure', 'CE_Fatal', 'CE_None', 'CE_Warning', 'CPLES_BackslashQuotable', 'CPLES_CSV', 'CPLES_SQL', 'CPLES_URL', 'CPLES_XML', 'CPLE_AWSAccessDenied', 'CPLE_AWSBucketNotFound', 'CPLE_AWSInvalidCredentials', 'CPLE_AWSObjectNotFound', 'CPLE_AWSSignatureDoesNotMatch', 'CPLE_AppDefined', 'CPLE_AssertionFailed', 'CPLE_FileIO', 'CPLE_HttpResponse', 'CPLE_IllegalArg', 'CPLE_NoWriteAccess', 'CPLE_None', 'CPLE_NotSupported', 'CPLE_ObjectNull', 'CPLE_OpenFailed', 'CPLE_OutOfMemory', 'CPLE_UserInterrupt', 'CXT_Attribute', 'CXT_Comment', 'CXT_Element', 'CXT_Literal', 'CXT_Text', 'DCAP_CREATE', 'DCAP_CREATECOPY', 'DCAP_DEFAULT_FIELDS', 'DCAP_NOTNULL_FIELDS', 'DCAP_NOTNULL_GEOMFIELDS', 'DCAP_OPEN', 'DCAP_RASTER', 'DCAP_VECTOR', 'DCAP_VIRTUALIO', 'DIM_TYPE_HORIZONTAL_X', 'DIM_TYPE_HORIZONTAL_Y', 'DIM_TYPE_PARAMETRIC', 'DIM_TYPE_TEMPORAL', 'DIM_TYPE_VERTICAL', 'DMD_CONNECTION_PREFIX', 'DMD_CREATIONDATATYPES', 'DMD_CREATIONFIELDDATATYPES', 'DMD_CREATIONOPTIONLIST', 'DMD_EXTENSION', 'DMD_EXTENSIONS', 'DMD_HELPTOPIC', 'DMD_LONGNAME', 'DMD_MIMETYPE', 'DMD_SUBDATASETS', 'GARIO_COMPLETE', 'GARIO_ERROR', 'GARIO_PENDING', 'GARIO_UPDATE', 'GA_ReadOnly', 'GA_Update', 'GCI_AlphaBand', 'GCI_BlackBand', 'GCI_BlueBand', 'GCI_CyanBand', 'GCI_GrayIndex', 'GCI_GreenBand', 'GCI_HueBand', 'GCI_LightnessBand', 'GCI_MagentaBand', 'GCI_PaletteIndex', 'GCI_RedBand', 'GCI_SaturationBand', 'GCI_Undefined', 'GCI_YCbCr_CbBand', 'GCI_YCbCr_CrBand', 'GCI_YCbCr_YBand', 'GCI_YellowBand', 'GDAL_DATA_COVERAGE_STATUS_DATA', 'GDAL_DATA_COVERAGE_STATUS_EMPTY', 'GDAL_DATA_COVERAGE_STATUS_UNIMPLEMENTED', 'GDT_Byte', 'GDT_CFloat32', 'GDT_CFloat64', 'GDT_CInt16', 'GDT_CInt32', 'GDT_Float32', 'GDT_Float64', 'GDT_Int16', 'GDT_Int32', 'GDT_TypeCount', 'GDT_UInt16', 'GDT_UInt32', 'GDT_Unknown', 'GFT_Integer', 'GFT_Real', 'GFT_String', 'GFU_Alpha', 'GFU_AlphaMax', 'GFU_AlphaMin', 'GFU_Blue', 'GFU_BlueMax', 'GFU_BlueMin', 'GFU_Generic', 'GFU_Green', 'GFU_GreenMax', 'GFU_GreenMin', 'GFU_Max', 'GFU_MaxCount', 'GFU_Min', 'GFU_MinMax', 'GFU_Name', 'GFU_PixelCount', 'GFU_Red', 'GFU_RedMax', 'GFU_RedMin', 'GF_Read', 'GF_Write', 'GMF_ALL_VALID', 'GMF_ALPHA', 'GMF_NODATA', 'GMF_PER_DATASET', 'GPI_CMYK', 'GPI_Gray', 'GPI_HLS', 'GPI_RGB', 'GRA_Average', 'GRA_Bilinear', 'GRA_Cubic', 'GRA_CubicSpline', 'GRA_Lanczos', 'GRA_Max', 'GRA_Med', 'GRA_Min', 'GRA_Mode', 'GRA_NearestNeighbour', 'GRA_Q1', 'GRA_Q3', 'GRIORA_Average', 'GRIORA_Bilinear', 'GRIORA_Cubic', 'GRIORA_CubicSpline', 'GRIORA_Gauss', 'GRIORA_Lanczos', 'GRIORA_Mode', 'GRIORA_NearestNeighbour', 'GTO_BIT', 'GTO_BSQ', 'GTO_TIP', 'OF_ALL', 'OF_GNM', 'OF_MULTIDIM_RASTER', 'OF_RASTER', 'OF_READONLY', 'OF_SHARED', 'OF_UPDATE', 'OF_VECTOR', 'OF_VERBOSE_ERROR', '_SwigNonDynamicMeta', '__builtin__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', '_gdalconst', '_swig_add_metaclass', '_swig_getattr', '_swig_python_version_info', '_swig_repr', '_swig_setattr', '_swig_setattr_nondynamic', '_swig_setattr_nondynamic_class_variable', '_swig_setattr_nondynamic_instance_variable']

@@ -1,0 +1,51 @@
+SELECT
+
+MetadataTable.TablePhysicalName AS tabphyname,
+MetadataTableColumn.TableColumnSequence AS colsequence,
+MetadataTableColumn.ColumnPhysicalName AS colphyname,
+MetadataTableColumn.ColumnLogicalName AS collogname,
+MetadataTableColumn.ColumnLabel AS collabel,
+MetadataTableColumn.LogicalDataType AS logicaldatatype,
+MetadataTableColumn.NotNull AS notnull,
+MetadataTableColumn.FieldSize AS fieldSize,
+MetadataTableColumn.DecimalPrecision precision,
+MetadataTableColumn.Minimum AS minimum,
+MetadataTableColumn.Maximum AS maximum,
+MetadataTableColumn.UnitsOfMeasureUnAbbreviated AS uom,
+MetadataDomainMaster.DomainName AS domainname,
+MetadataTableColumn.ColumnDescription AS coldesc
+
+FROM
+
+MetadataTable,
+MetadataTableColumn,
+MetadataDomainMaster
+
+RIGHT INNER JOIN MetadataTable ON MetadataTable.TableID = MetadataTableColumn.TableID
+
+LEFT OUTER JOIN MetadataDomainMaster ON MetadataTableColumn.DomainID = MetadataDomainMaster.DomainID
+
+
+This works:
+
+SELECT
+
+t.TablePhysicalName AS tabphyname,
+c.TableColumnSequence AS colsequence,
+c.ColumnPhysicalName AS colphyname,
+c.ColumnLogicalName AS collogname,
+c.ColumnLabel AS collabel,
+c.LogicalDataType AS logicaldatatype,
+c.NotNull AS notnull,
+c.FieldSize AS fieldSize,
+c.DecimalPrecision precision,
+c.Minimum AS minimum,
+c.Maximum AS maximum,
+c.UnitsOfMeasureUnAbbreviated AS uom,
+m.DomainName AS domainname,
+c.ColumnDescription AS coldesc
+
+FROM
+MetadataTableColumn c
+RIGHT JOIN MetadataTable t ON t.TableID = c.TableID
+LEFT OUTER JOIN MetadataDomainMaster m ON c.DomainID = m.DomainID

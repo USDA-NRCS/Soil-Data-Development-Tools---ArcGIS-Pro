@@ -1,0 +1,11 @@
+-- Find SSURGO-SQLite tables with or without ROWID
+-- This may not be a foolproof method. I thought there was a PRAGMA statement...
+--
+SELECT name,
+CASE WHEN sql LIKE '%WITHOUT ROWID%' COLLATE NOCASE THEN 'No'
+ELSE 'Yes'
+END AS HasRowID
+FROM sqlite_master AS M
+INNER JOIN mdstattabs AS T ON M.name = T.tabphyname
+WHERE type = 'table'
+ORDER BY name;

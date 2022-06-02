@@ -1,0 +1,68 @@
+
+
+#Import gdal
+from osgeo import gdal
+
+#Open existing dataset
+src_ds = gdal.Open( src_filename )
+
+#Open output format driver, see gdal_translate --formats for list
+format = "GTiff"
+driver = gdal.GetDriverByName( format )
+
+#Output to new format
+dst_ds = driver.CreateCopy( dst_filename, src_ds, 0 )
+
+#Properly close the datasets to flush to disk
+dst_ds = None
+src_ds = None
+
+# =============================
+# =============================
+# =============================
+
+# Imports and Input Data
+# Using gdal for raster data and ogr for vector data
+# load a raster and a polygon layer. 
+# get geotransform values for the raster.
+# try to use same coordinate system for both
+
+import gdal 
+import ogr 
+fn_ras = 'path/to/raster'         # used as a template raster
+fn_vec = 'path/to/vector'         # path to vector layer being converted to raster
+
+ras_ds = gdal.Open(fn_ras)        # connect to template raster
+geot = ras_ds.GetGeoTransform()   # get geotransformation for template raster
+
+vec_ds = gdal.Open(fn_vec)        # connect to input vector data
+lyr = vec_ds.GetLayer()           # get vector layer to be converted to raster
+
+
+# =============================
+# Create a new, empty raster for the rasterized polygons
+# concurrent and orthogonal to the input raster
+# Not sure what 'out_net' references, perhaps the fullpath to raster file.
+
+drv_tiff = gdal.GetDriverByName("GTiff") 
+chn_ras_ds = drv_tiff.Create(out_net, ras_ds.RasterXSize, ras_ds.RasterYSize, 1, gdal.GDT_Float32)
+chn_ras_ds.SetGeoTransform(geot)  # Do I really need this? Need to check out the properties for this.
+
+# =============================
+# Now conduct the raster conversion.
+# Passing in the empty raster
+
+gdal.RasterizeLayer(chn_ras_ds, [1], lyr) 
+chn_ras_ds.GetRasterBand(1).SetNoDataValue(0.0) 
+chn_ras_ds = None
+
+
+# =============================
+# Rasterize by Attribute
+# Use either the options or attribute argument
+
+gdal.RasterizeLayer(chn_ras_ds, [1], lyr, options=['ATTRIBUTE=chn_id'])
+chn_ras_ds.GetRasterBand(1).SetNoDataValue(0.0) 
+chn_ras_ds = None
+
+

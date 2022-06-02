@@ -1,0 +1,44 @@
+-- These are mod_spatialite extension commands for adding geometry columns.
+-- I had problems the first time I ran these in a batch. Might want to run them
+-- individually from a script so that each query completes before the next is started.
+
+-- Another possible problem. I think I need to check the 'geom_cols_ref_sys' table 
+-- to make sure that 4326 record exists before adding geometry column
+-- Looks like there may be a problem with the 'geom_cols_ref_sys' table in the pro-spatialite database. Has no columns.
+-- However the spatial_ref_sys table is populated. Are both tables required? https://www.gaia-gis.it/gaia-sins/spatialite-tutorial-2.3.1.html
+
+
+
+SELECT AddGeometryColumn('featline', 'shape', 4326, 'LINESTRING', 2);
+SELECT CreateSpatialIndex('featline', 'shape');
+
+SELECT AddGeometryColumn('featpoint', 'shape', 4326, 'POINT', 'XY');
+SELECT CreateSpatialIndex('featpoint', 'shape');
+
+SELECT AddGeometryColumn('muline', 'shape', 4326, 'LINESTRING', 'XY');
+SELECT CreateSpatialIndex('muline', 'shape');
+
+SELECT AddGeometryColumn('mupoint', 'shape', 4326, 'POINT', 'XY');
+SELECT CreateSpatialIndex('mupoint', 'shape');
+
+SELECT AddGeometryColumn('mupolygon', 'shape', 4326, 'MULTIPOLYGON', 'XY');
+SELECT RecoverGeometryColumn('mupolygon', 'shape', 4326, 'MULTIPOLYGON', 'XY');
+SELECT UpdateLayerStatistics('mupolygon', 'shape');
+SELECT CreateSpatialIndex('mupolygon', 'shape');
+
+SELECT AddGeometryColumn('sapolygon', 'shape', 4326, 'MULTIPOLYGON', 'XY');
+SELECT CreateSpatialIndex('sapolygon', 'shape');
+
+
+-- 
+PRAGMA table_info(test_geom);
+
+-- 
+SELECT *
+FROM geometry_columns
+WHERE f_table_name LIKE 'test_geom';
+
+-- 
+SELECT *
+FROM sqlite_master
+WHERE type = 'trigger' AND tbl_name LIKE 'test_geom';

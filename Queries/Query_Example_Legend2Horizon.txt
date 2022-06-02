@@ -1,0 +1,9 @@
+-- Example SQLite query for legend, mapunit, component and horizon data
+--
+SELECT L.areasymbol, areaname, musym, compname, compkind, majcompflag, hzname, hzdept_r, hzdepb_r, om_r, sandtotal_r, silttotal_r, claytotal_r
+FROM legend L
+INNER JOIN mapunit M ON L.lkey = M.lkey
+LEFT OUTER JOIN component C ON M.mukey = C.mukey
+LEFT OUTER JOIN chorizon H ON C.cokey = H.cokey
+ORDER BY areasymbol, M.mukey, comppct_r DESC, C.cokey, hzdept_r ASC
+;

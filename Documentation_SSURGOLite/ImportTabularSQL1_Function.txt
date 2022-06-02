@@ -1,0 +1,393 @@
+## ===================================================================================
+class MyError(Exception):
+    # Custom error
+
+    def __init__(self, *args):
+
+        if args:
+            self.message = args[0]
+
+        else:
+            self.message = None
+
+    def __str__(self):
+
+        if self.message:
+            return self.message
+
+        else:
+            return 'MyError has been raised'
+
+## ===================================================================================
+def errorMsg(excInfo):
+    # Capture system error from traceback and then exit
+    # Should I be passing in the value for sys.exc_info()?
+    try:
+        # excInfo object is a tuple that should contain 3 values
+        # 0: type gets the type of the exception being handled (a subclass of BaseException)
+        # 1: value gets the exception instance (an instance of the exception type)
+        # 2: traceback gets a traceback object which encapsulates the call stack at the point where the exception originally occurred
+
+        if not excInfo is None:
+
+            #PrintMsg(70 * "=", 2)
+            exc_type, exc_value, exc_tb = sys.exc_info()
+
+            for tb_info in traceback.extract_tb(exc_tb):
+                filename, linenum, funcname, source = tb_info
+                #errInfo = str(sys.exc_info()[1])
+
+                if funcname != '<module>':
+                    funcname = funcname + '()'
+
+                if source.strip().startswith("raise MyError"):
+                    # raised error
+                    #PrintMsg(errInfo + " (function " + sys._getframe().f_code.co_name + ")", 2)
+                    PrintMsg(exc_value + " (function " + sys._getframe().f_code.co_name + ")", 2)
+
+                else:
+                    PrintMsg("Error '" + exc_value + "' in " + os.path.basename(filename) + \
+                         " at line number " + str(linenum) + ":" + "\n" + source, 2)
+
+            #PrintMsg(70 * "=", 2)
+
+            return
+
+    except:
+        msg = "Exception raised in error-handling function (errorMsg)"
+        sys.exit(msg)
+
+## ===================================================================================
+def PrintMsg(msg, severity=0):
+    # Adds tool message to the geoprocessor
+    #
+    #Split the message on \n first, so that if it's multiple lines, a GPMessage will be added for each line
+    try:
+        for string in msg.split('\n'):
+            #Add a geoprocessing message (in case this is run as a tool)
+            if severity == 0:
+                #arcpy.AddMessage(string)
+                pass
+
+            elif severity == 1:
+                #arcpy.AddWarning(string)
+                pass
+
+            elif severity == 2:
+                #arcpy.AddError(" \n" + string)
+                pass
+
+    except MyError as e:
+        PrintMsg(str(e), 2)
+        return False
+
+    except:
+        errorMsg(sys.exc_info())
+        return False
+
+## ===================================================================================
+def ImportTabularSQL1(newDB, pathList, dbVersion, tableList, conn, liteCur):
+    # Use csv reader method of importing text files into geodatabase for those
+    # that do not have a populated SSURGO database
+    #
+    # Using unique constraint to prevent duplicate records in sdv* tables. Dupes will be skipped.
+    # For any of the other data tables, a unique contraint violation will throw an error and stop the import.
+    #
+    # Import ALL of the original SSURGO cointerp data
+    #
+    # Currently does not accomodate OBJECTID in attribute tables, but plan to incorporate that functionality.
+    # This will be the second attempt to work with a template database having OBJECTID. First attempt failed badly.
+    #
+    try:
+        # new code from ImportTables
+        #codePage = 'cp1252'
+        result = False
+
+        #env.workspace = newDB
+        csv.field_size_limit(min(sys.maxsize, 2147483646))
+
+        PrintMsg(".", 0)
+        PrintMsg(".\tImporting tabular data using function 'ImportTabularSQL1'...", 0)
+        PrintMsg(".\tAll 19 cointerp columns are included")
+
+        iCntr = 0
+
+        # Create a list of textfiles to be imported. The import process MUST follow the
+        # order in this list in order to maintain referential integrity. This list
+        # will need to be updated if the SSURGO data model is changed in the future.
+        #
+        txtFiles = ["distmd","legend","distimd","distlmd","lareao","ltext","mapunit", \
+        "comp","muaggatt","muareao","mucrpyd","mutext","chorizon","ccancov","ccrpyd", \
+        "cdfeat","cecoclas","ceplants","cerosnac","cfprod","cgeomord","chydcrit", \
+        "cinterp","cmonth", "cpmatgrp", "cpwndbrk","crstrcts","csfrags","ctxfmmin", \
+        "ctxmoicl","ctext","ctreestm","ctxfmoth","chaashto","chconsis","chdsuffx", \
+        "chfrags","chpores","chstrgrp","chtext","chtexgrp","chunifie","cfprodo","cpmat","csmoist", \
+        "cstemp","csmorgc","csmorhpp","csmormr","csmorss","chstr","chtextur", "chtexmod", \
+        "featdesc", "sacatlog","sainterp","sdvalgorithm","sdvattribute","sdvfolder","sdvfolderattribute"]
+
+
+        fldInfos = GetFieldInfo("mdstattabs", liteCur)
+        fldNames = list()
+
+        for fld in fldInfos:
+            fldName, fldType = fld
+            fldNames.append(fldName.lower())
+
+        if "daglevel" in fldNames:
+            # Get ordered list of tables to import
+            PrintMsg(".\tUsing DAG Levels to define tabular import sequence", 0)
+            importOrder = GetImportOrder(liteCur)
+            txtFiles = [f[0] for f in importOrder]
+
+        # Create a dictionary. Keys are tabular-textfile names with table information
+        tblInfo = GetTableInfoSQL(liteCur)
+
+        if len(tblInfo) == 0:
+            raise MyError("")
+
+        # Need to import text files in a specific order or the MS Access database will
+        # return an error due to table relationships and key violations
+        arcpy.SetProgressor("step", "Importing tabular data...", 0, len(txtFiles))
+
+        start = time.time()
+
+        for txtFile in txtFiles:
+
+            # Get table name and alias from dictionary
+            if txtFile in tblInfo:
+                tbl, aliasName = tblInfo[txtFile]
+
+            elif txtFile == "featdesc":
+                tbl = "featdesc"
+                aliasName = "Feature Description"
+
+            else:
+                err = "Textfile reference '" + txtFile + "' not found in 'mdstattabs table'"
+                raise MyError(err)
+
+            # continue if the target table exists
+            if not tbl in tableList:
+                err = "Output table '" + tbl + "' not found in " + newDB
+                raise MyError(err)
+
+            fldInfos = GetFieldInfo(tbl, liteCur)
+            fldNames = list()
+            fldLengths = list()
+
+            for fld in fldInfos:
+                fldName, fldType = fld
+                fldNames.append(fldName)
+
+            # PrintMsg(".\tFields for " + tbl + ": " + ",  ".join(fldNames), 0)
+
+            if len(fldNames) == 0:
+                err = "Failed to get field names for " + tbl
+                raise MyError(err)
+
+            src = len(fldNames) * ['?']  # this will be used below in executemany
+
+            # PrintMsg(".\tProcessing " + tbl + " table with " + str(len(fldNames)) + " fields", 0)
+            arcpy.SetProgressorLabel("Importing tabular data for:  " + tbl)
+
+            # Begin iterating through the each of the input SSURGO datasets
+            for tabularFolder in pathList:
+                iCntr += 1
+                #newFolder = os.path.dirname(os.path.dirname(tabularFolder)) # survey dataset folder
+
+                # parse Areasymbol from database name. If the geospatial naming convention isn't followed,
+                # then this will not work.
+                soilsFolder = os.path.dirname(tabularFolder)
+                spatialFolder = os.path.join(soilsFolder, "spatial")
+                fnAreasymbol = soilsFolder[(soilsFolder.rfind("_") + 1):].upper()
+
+                # move to tabular folder. Not sure if this is necessary as long as I use full paths
+                # env.workspace = tabularFolder
+
+                if tbl == "featdesc":
+                    # this file is the only txt file in the spatial folder
+                    txtFile = "soilsf_t_" + fnAreasymbol
+                    txtPath = os.path.join(spatialFolder, txtFile + ".txt")
+                    #env.workspace =
+
+                else:
+                    # Full path to SSURGO tabular folder
+                    txtPath = os.path.join(tabularFolder, txtFile + ".txt")
+
+                # if the tabular directory is empty return False
+                if len(os.listdir(tabularFolder)) < 1:
+                    err = "No text files found in the tabular folder"
+                    raise MyError(err)
+
+                # Make sure that input tabular data has the correct SSURGO version for this script
+                ssurgoVersion = SSURGOVersionTxt(tabularFolder)
+
+                ## NEED TO FIX THIS VERSION CHECK IN 2 PLACES
+                ##                if ssurgoVersion != dbVersion:
+                ##                    err = "Tabular data in " + tabularFolder + " (SSURGO Version " + str(ssurgoVersion) + ") is not supported"
+                ##                    raise MyError(err)
+
+                ##  *********************************************************************************************************
+                # Full path to SSURGO text file
+                # txtPath = os.path.join(tabularFolder, txtFile + ".txt")
+
+                curValues = list()
+
+                if not tbl in ['sdvfolderattribute', 'sdvattribute', 'sdvfolder', 'sdvalgorithm']:
+                    # Import all tables (including cointerp), except for sdv* tables.
+                    # The sdv* tables will be imported one record at a time instead of in a batch.
+                    #
+                    time.sleep(0.05)  # Occasional write errors
+
+                    iRows = 1  # input textfile line number
+
+                    if os.path.isfile(txtPath):
+                    #if arcpy.Exists(txtPath):
+
+                        try:
+                            # Use csv reader to read each line in the text file. Save the values to a list of lists.
+
+                            with open(txtPath, 'r', encoding='UTF-8') as tabData:
+                                rows = csv.reader(tabData, delimiter='|', quotechar='"')
+
+
+                                for row in rows:
+                                    #row = [val if val else None for val in row]  # trying to eliminate zeros resulting from empty string
+                                    curValues.append(tuple([val if val else None for val in row]))
+                                    iRows += 1
+                                    #if tbl == "comonth" and iRows == 2:
+                                    #    PrintMsg(".\tcomonth values: " + str(row))
+
+                            insertQuery = "INSERT INTO " + tbl + " VALUES (" + ",".join(src) + ");"
+                            liteCur.executemany(insertQuery, curValues)
+                            conn.commit()
+
+                        except:
+                            #PrintMsg(" \n" + str(row), 1)
+                            errorMsg(sys.exc_info())
+                            err = "Error writing line " + Number_Format(iRows, 0, True) + " from " + txtPath
+                            raise MyError(err)
+
+                    else:
+                        err = "Missing tabular data file (" + txtPath + ")"
+                        raise MyError(err)
+
+                elif tbl in ('sdvfolderattribute', 'sdvattribute', 'sdvfolder', 'sdvalgorithm'):
+                    # Import SDV tables one record at a time, in case there are duplicate keys
+                    # 'sdvfolderattribute', 'sdvattribute', 'sdvfolder', 'sdvalgorithm'
+                    #
+                        iRows = 1  # input textfile line number
+
+                        if os.path.isfile(txtPath):
+                        # if arcpy.Exists(txtPath):
+
+                            # Use csv reader to read each line in the text file
+                            insertQuery = "INSERT INTO " + tbl + " VALUES (" + ",".join(src) + ");"
+
+                            with open(txtPath, 'r', encoding='UTF-8') as tabData:
+                            #with open(txtPath, 'r', encoding='iso-8859-1') as tabData:
+                                # catching different encoding for NASIS export (esp. sdvattribute table) which as of 2020 uses ISO-8859-1
+                                rows = csv.reader(tabData, delimiter='|', quotechar='"')
+
+                                for row in rows:
+                                    try:
+                                        liteCur.execute(insertQuery, row)
+                                        conn.commit()
+                                        iRows += 1
+
+                                    except sqlite3.IntegrityError:
+                                        # Need to see if I can more narrowly define the error types I want to pass or throw an error
+                                        pass
+
+                                    except:
+                                        errorMsg(sys.exc_info())
+
+                        else:
+                            err = "Missing tabular data file (" + txtPath + ")"
+                            raise MyError(err)
+
+
+
+                # End of table iteration
+            arcpy.SetProgressorPosition()
+
+        PrintMsg(".\t", 0)
+        theMsg = ".\tTotal processing time for tabular import: " + elapsedTime(start) + " \n "
+        PrintMsg(theMsg, 0)
+        PrintMsg(".", 0)
+        #conn.close()  # end of importing tabular
+
+##          End Table Iteration
+
+        result = True
+
+    except MyError as e:
+        # Example: raise MyError("This is an error message")
+        PrintMsg(str(e), 2)
+        result = False
+
+    except:
+        errorMsg(sys.exc_info())
+        result = False
+
+    finally:
+        try:
+            conn.close()
+            del conn
+
+        except:
+            pass
+
+        return result
+
+## ===================================================================================
+## ===============================================================================================================
+def GetTableInfoSQL(liteCur):
+    # Retrieve physical and alias names from MDSTATTABS table and assigns them to a blank dictionary.
+    # Stores tabular-text filename (key) tablename, table aliase (value) in a Python dictionary i.e. {chasshto:'Horizon AASHTO,chaashto'}
+
+    try:
+        tblInfo = dict()
+
+        # Query mdstattabs table containing information for other SSURGO tables
+        tbl = "mdstattabs"
+        queryTableInfo = "SELECT tabphyname, tablabel, iefilename FROM " + tbl
+        #PrintMsg("Using query to get table info:\t" + queryTableInfo, 0)
+
+        for row in liteCur.execute(queryTableInfo):
+
+            physicalName, aliasName, importFileName = row
+
+            if not importFileName in tblInfo:
+                #PrintMsg("\t" + importFileName + ": " + physicalName, 1)
+                tblInfo[importFileName] = physicalName, aliasName
+
+        if len(tblInfo) == 0:
+            raise MyError("Failed to get required information from mdstattabs table. Is it empty?")
+
+        return tblInfo
+
+    except MyError as e:
+        # Example: raise MyError("This is an error message")
+        PrintMsg(str(e), 2)
+        return dict()
+
+    except:
+        errorMsg(sys.exc_info())
+        return dict()
+
+## ===================================================================================
+def GetFieldInfo(tblName, liteCur):
+    # Get list of (fieldname, type) for this table
+    try:
+        fldNames = list()
+
+        queryFieldNames = "SELECT name, type FROM PRAGMA_TABLE_INFO('" + tblName + "');"
+        liteCur.execute(queryFieldNames)
+        rows = liteCur.fetchall()
+        fldInfo= [row for row in rows]
+
+        return fldInfo
+
+    except:
+        errorMsg(sys.exc_info())
+        return []
